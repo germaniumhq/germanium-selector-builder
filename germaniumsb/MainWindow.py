@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'germaniumsb/MainWindow.ui'
 #
-# Created: Mon Jul 24 07:34:35 2017
+# Created: Mon Jul 24 08:12:50 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -43,9 +43,12 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.pickElementButton)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
-        self.plainTextEdit = QtGui.QPlainTextEdit(self.centralwidget)
-        self.plainTextEdit.setObjectName("plainTextEdit")
-        self.gridLayout.addWidget(self.plainTextEdit, 1, 0, 1, 1)
+        self.codeEdit = QtGui.QPlainTextEdit(self.centralwidget)
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        self.codeEdit.setFont(font)
+        self.codeEdit.setObjectName("codeEdit")
+        self.gridLayout.addWidget(self.codeEdit, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
@@ -71,6 +74,7 @@ class Ui_MainWindow(object):
         self.stopBrowserButton.setText(QtGui.QApplication.translate("MainWindow", "Stop", None, QtGui.QApplication.UnicodeUTF8))
         self.highlightElementButton.setText(QtGui.QApplication.translate("MainWindow", "Highlight", None, QtGui.QApplication.UnicodeUTF8))
         self.pickElementButton.setText(QtGui.QApplication.translate("MainWindow", "Pick", None, QtGui.QApplication.UnicodeUTF8))
+        self.codeEdit.setPlainText(QtGui.QApplication.translate("MainWindow", "type your selector", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.action_About.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
 

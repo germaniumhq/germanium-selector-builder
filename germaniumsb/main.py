@@ -4,6 +4,11 @@ from PySide.QtCore import *
 from MainWindow import Ui_MainWindow
 from germanium.static import *
 
+from .build_selector import build_selector
+from .pick_element import pick_element
+
+BROWSERS=["Chrome", "Firefox", "IE"]
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -12,9 +17,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.show()
 
     def assignWidgets(self):
-        self.browserCombo.addItem("Chrome")
-        self.browserCombo.addItem("Firefox")
-        self.browserCombo.addItem("IE")
+        for browser in BROWSERS:
+            self.browserCombo.addItem(browser)
+
         #=====================================================
         # listen for events
         #=====================================================
@@ -26,7 +31,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._show_start_button()
 
     def onStartBrowserClick(self):
-        open_browser("chrome")
+        open_browser(BROWSERS[self.browserCombo.currentIndex()])
         self._show_stop_button()
 
     def onStopBrowserClick(self):
@@ -34,10 +39,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._show_start_button()
 
     def onPickElementClick(self):
-        pass
+        element = pick_element()
+        self.codeEdit.setPlainText(build_selector(element))
 
     def onHighlightElementClick(self):
-        pass
+        selector = eval(self.codeEdit.toPlainText())
+        highlight(selector)
 
     def _show_start_button(self):
         self.startBrowserButton.show()
@@ -56,4 +63,5 @@ if __name__ == '__main__':
     mainWin = MainWindow()
     ret = app.exec_()
     sys.exit( ret )
+
 

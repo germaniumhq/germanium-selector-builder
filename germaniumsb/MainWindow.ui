@@ -75,7 +75,16 @@
      </layout>
     </item>
     <item row="1" column="0">
-     <widget class="QPlainTextEdit" name="plainTextEdit"/>
+     <widget class="QPlainTextEdit" name="codeEdit">
+      <property name="font">
+       <font>
+        <family>Courier New</family>
+       </font>
+      </property>
+      <property name="plainText">
+       <string>type your selector</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
