@@ -4,10 +4,11 @@ from PySide.QtCore import *
 from MainWindow import Ui_MainWindow
 from germanium.static import *
 
-from .build_selector import build_selector
-from .pick_element import pick_element
+from germaniumsb.build_selector import build_selector
+from germaniumsb.pick_element import pick_element
 
 BROWSERS=["Chrome", "Firefox", "IE"]
+
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -20,13 +21,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for browser in BROWSERS:
             self.browserCombo.addItem(browser)
 
+        shortcut = QShortcut(QKeySequence(self.tr("Ctrl+R", "File|Open")),
+                             self)
+
         #=====================================================
         # listen for events
         #=====================================================
         self.startBrowserButton.clicked.connect(self.onStartBrowserClick)
         self.stopBrowserButton.clicked.connect(self.onStopBrowserClick)
         self.pickElementButton.clicked.connect(self.onPickElementClick)
-        self.highlightElementButton.clicked.connect(self.onHighlightElementClick)
+        self.highlightElementButton.clicked.connect(self.onHighlightLocalEntry)
+
+        shortcut.activated.connect(self.onHighlightLocalEntry)
 
         self._show_start_button()
 
@@ -42,7 +48,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         element = pick_element()
         self.codeEdit.setPlainText(build_selector(element))
 
-    def onHighlightElementClick(self):
+    def onHighlightLocalEntry(self):
         selector = eval(self.codeEdit.toPlainText())
         highlight(selector)
 
@@ -57,6 +63,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stopBrowserButton.show()
         self.pickElementButton.show()
         self.highlightElementButton.show()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

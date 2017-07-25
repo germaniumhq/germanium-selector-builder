@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'germaniumsb/MainWindow.ui'
 #
-# Created: Mon Jul 24 08:12:50 2017
+# Created: Wed Jul 26 00:24:53 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -47,6 +47,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setFamily("Courier New")
         self.codeEdit.setFont(font)
+        self.codeEdit.setPlainText("")
         self.codeEdit.setObjectName("codeEdit")
         self.gridLayout.addWidget(self.codeEdit, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -74,7 +75,6 @@ class Ui_MainWindow(object):
         self.stopBrowserButton.setText(QtGui.QApplication.translate("MainWindow", "Stop", None, QtGui.QApplication.UnicodeUTF8))
         self.highlightElementButton.setText(QtGui.QApplication.translate("MainWindow", "Highlight", None, QtGui.QApplication.UnicodeUTF8))
         self.pickElementButton.setText(QtGui.QApplication.translate("MainWindow", "Pick", None, QtGui.QApplication.UnicodeUTF8))
-        self.codeEdit.setPlainText(QtGui.QApplication.translate("MainWindow", "type your selector", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.action_About.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
 

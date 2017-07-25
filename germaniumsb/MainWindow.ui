@@ -82,7 +82,7 @@
        </font>
       </property>
       <property name="plainText">
-       <string>type your selector</string>
+       <string/>
       </property>
      </widget>
     </item>
