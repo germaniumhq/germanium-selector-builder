@@ -5,6 +5,7 @@ from MainWindow import Ui_MainWindow
 from germanium.static import *
 
 from germaniumsb.build_selector import build_selector
+from germaniumsb.code_editor import extract_code
 from germaniumsb.pick_element import pick_element
 
 BROWSERS=["Chrome", "Firefox", "IE"]
@@ -21,8 +22,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for browser in BROWSERS:
             self.browserCombo.addItem(browser)
 
-        shortcut = QShortcut(QKeySequence(self.tr("Ctrl+R", "File|Open")),
-                             self)
+        highlightShortcut = QShortcut(QKeySequence(self.tr("Ctrl+H", "Execute|Highlight")),
+                                      self)
+        pickShortcut = QShortcut(QKeySequence(self.tr("Ctrl+K", "Execute|Pick")),
+                                 self)
 
         #=====================================================
         # listen for events
@@ -32,7 +35,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pickElementButton.clicked.connect(self.onPickElementClick)
         self.highlightElementButton.clicked.connect(self.onHighlightLocalEntry)
 
-        shortcut.activated.connect(self.onHighlightLocalEntry)
+        highlightShortcut.activated.connect(self.onHighlightLocalEntry)
+        pickShortcut.activated.connect(self.onPickElementClick)
 
         self._show_start_button()
 
@@ -45,12 +49,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._show_start_button()
 
     def onPickElementClick(self):
+        if not get_germanium():
+            QMessageBox.critical(self,
+                                 self.tr("No Browser"),
+                                 "You need to start a browser before picking elements.",
+                                 QMessageBox.Close)
+            return
+
         element = pick_element()
         self.codeEdit.setPlainText(build_selector(element))
 
     def onHighlightLocalEntry(self):
-        selector = eval(self.codeEdit.toPlainText())
+        if not get_germanium():
+            QMessageBox.critical(self,
+                                 self.tr("No Browser"),
+                                 "You need to start a browser before highlighting selectors.",
+                                 QMessageBox.Close)
+            return
+
+        textCursor = self.codeEdit.textCursor()
+        cursorLocation = {"column": textCursor.columnNumber(), "row": textCursor.blockNumber()}
+
+        code = extract_code(self.codeEdit.toPlainText(), cursorLocation)
+
+        selector = eval(code)
         highlight(selector)
+
 
     def _show_start_button(self):
         self.startBrowserButton.show()
