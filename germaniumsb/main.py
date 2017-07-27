@@ -5,6 +5,7 @@ from MainWindow import Ui_MainWindow
 from germanium.static import *
 import traceback
 
+from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
 from germaniumsb.build_selector import build_selector
 from germaniumsb.code_editor import extract_code
 from germaniumsb.pick_element import pick_element
@@ -12,9 +13,18 @@ from germaniumsb.pick_element import pick_element
 BROWSERS=["Chrome", "Firefox", "IE"]
 
 
+def _(callable):
+    def ignore_args(*args, **kw):
+        return callable()
+
+    return ignore_args
+
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
+        self._browser = BrowserStateMachine()
+
         self.setupUi(self)
         self.assign_widgets()
         self.show()
@@ -31,25 +41,62 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         cancel_pick_shortcut = QShortcut(QKeySequence(self.tr("Escape", "Execute|Cancel Pick")),
                                          self)
 
+        self.startBrowserButton.show()
+        self.stopBrowserButton.hide()
+        self.pickElementButton.hide()
+        self.cancelPickButton.hide()
+        self.highlightElementButton.hide()
+
+        # start button
+        self._browser.after_enter(BrowserState.STOPPED, _(self.startBrowserButton.show))
+        self._browser.after_leave(BrowserState.STOPPED, _(self.startBrowserButton.hide))
+
+        # stop button
+        self._browser.after_enter(BrowserState.STOPPED, _(self.stopBrowserButton.hide))
+        self._browser.after_leave(BrowserState.STOPPED, _(self.stopBrowserButton.show))
+
+        # highlight button
+        self._browser.after_leave(BrowserState.STOPPED, _(self.highlightElementButton.show))
+        self._browser.after_enter(BrowserState.STOPPED, _(self.highlightElementButton.hide))
+
+        # pick button
+        self._browser.after_enter(BrowserState.READY, _(self.pickElementButton.show))
+        self._browser.after_leave(BrowserState.READY, _(self.pickElementButton.hide))
+
+        # cancel pick button
+        self._browser.after_enter(BrowserState.PICKING, _(self.cancelPickButton.show))
+        self._browser.after_leave(BrowserState.PICKING, _(self.cancelPickButton.hide))
+
+        # actual actions mapped on the transitions
+        self._browser.before_enter(BrowserState.STOPPED, _(self.stop_browser))
+        self._browser.before_leave(BrowserState.STOPPED, _(self.start_browser))
+        self._browser.after_enter(BrowserState.STARTED, _(self._browser.inject_code))
+        self._browser.after_enter(BrowserState.INJECTING_CODE, _(self.inject_code))
+        self._browser.after_enter(BrowserState.PICKING, _(self.pick_element))
+        self._browser.after_enter(BrowserState.BROWSER_NOT_STARTED, _(self.browser_not_available))
+        self._browser.after_enter(BrowserState.BROWSER_NOT_READY, _(self.browser_not_available))
+
+        # self.codeEdit.setPlainText(build_selector(element))
+
         #=====================================================
         # listen for events
         #=====================================================
-        self.startBrowserButton.clicked.connect(self.on_start_browser_click)
-        self.stopBrowserButton.clicked.connect(self.on_stop_browser_click)
-        self.pickElementButton.clicked.connect(self.on_pick_element_click)
-        self.highlightElementButton.clicked.connect(self.on_highlight_local_entry)
-        self.cancelPickButton.clicked.connect(self.on_cancel_pick)
+        self.startBrowserButton.clicked.connect(_(self._browser.start_browser))
 
-        highlight_shortcut.activated.connect(self.on_highlight_local_entry)
-        pick_shortcut.activated.connect(self.on_pick_element_click)
-        cancel_pick_shortcut.activated.connect(self.on_cancel_pick)
+        self.stopBrowserButton.clicked.connect(_(self._browser.close_browser))
+        self.pickElementButton.clicked.connect(_(self._browser.pick))
+        pick_shortcut.activated.connect(_(self._browser.pick))
 
-        self._show_start_button()
+        self.cancelPickButton.clicked.connect(_(self._browser.cancel_pick))
+        cancel_pick_shortcut.activated.connect(_(self._browser.cancel_pick))
 
-    def on_start_browser_click(self):
+        # this shouldn't need a new state
+        self.highlightElementButton.clicked.connect(_(self.on_highlight_local_entry))
+        highlight_shortcut.activated.connect(_(self.on_highlight_local_entry))
+
+    def start_browser(self):
         try:
             open_browser(BROWSERS[self.browserCombo.currentIndex()])
-            self._show_stop_button()
         except Exception as e:
             error_message = QMessageBox()
             error_message.setWindowTitle(self.tr("Unable to start browser"))
@@ -58,42 +105,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             error_message.setIcon(QMessageBox.Critical)
             error_message.exec_()
 
+            return BrowserState.STOPPED
 
-    def on_stop_browser_click(self):
+    def stop_browser(self):
         close_browser()
-        self._show_start_button()
 
-    def on_pick_element_click(self):
-        if not get_germanium():
-            QMessageBox.critical(self,
-                                 self.tr("No Browser"),
-                                 "You need to start a browser before picking elements.",
-                                 QMessageBox.Close)
-            return
+    def inject_code(self):
+        self._browser.ready()
 
-        self.pickElementButton.hide()
-        self.cancelPickButton.show()
-
-        element = pick_element()
-        self.codeEdit.setPlainText(build_selector(element))
-
-    def on_cancel_pick(self):
-        if not get_germanium():
-            return
-
-        self.pickElementButton.show()
-        self.cancelPickButton.hide()
-
+    def pick_element(self):
         pass
 
-    def on_highlight_local_entry(self):
-        if not get_germanium():
-            QMessageBox.critical(self,
-                                 self.tr("No Browser"),
-                                 "You need to start a browser before highlighting selectors.",
-                                 QMessageBox.Close)
-            return
+    def browser_not_available(self):
+        QMessageBox.critical(self,
+                             self.tr("No Browser Available"),
+                             "You need to start a browser, and wait for it to load before picking"
+                             " or highlighting elements.",
+                             QMessageBox.Close)
 
+        self._browser.error_processed()
+
+    def on_highlight_local_entry(self):
         text_cursor = self.codeEdit.textCursor()
         cursor_location = {"column": text_cursor.columnNumber(), "row": text_cursor.blockNumber()}
 
@@ -101,21 +133,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         selector = eval(code)
         highlight(selector)
-
-    def _show_start_button(self):
-        self.startBrowserButton.show()
-        self.stopBrowserButton.hide()
-        self.pickElementButton.hide()
-        self.highlightElementButton.hide()
-        self.cancelPickButton.hide()
-
-    def _show_stop_button(self):
-        self.startBrowserButton.hide()
-        self.stopBrowserButton.show()
-        self.pickElementButton.show()
-        self.highlightElementButton.show()
-        self.cancelPickButton.hide()
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

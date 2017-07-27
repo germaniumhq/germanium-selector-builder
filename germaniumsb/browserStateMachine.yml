@@ -1,0 +1,49 @@
+name: Browser
+package: .
+states:
+  - STOPPED
+  - STARTED
+  - ERROR
+  - INJECTING_CODE
+  - READY
+  - PICKING
+  - GENERATING_SELECTOR
+  - BROWSER_NOT_STARTED
+  - BROWSER_NOT_READY
+transitions:
+  STOPPED:
+    start_browser: STARTED
+    pick: BROWSER_NOT_STARTED
+  STARTED:
+    inject_code: INJECTING_CODE
+    error: ERROR
+    close_browser: STOPPED
+    pick: BROWSER_NOT_READY
+  ERROR:
+    close_browser: STOPPED
+    error_processed: STARTED
+  INJECTING_CODE:
+    ready: READY
+    error: ERROR
+    close_browser: STOPPED
+    pick: BROWSER_NOT_READY
+    highlight: BROWSER_NOT_READY
+  READY:
+    pick: PICKING
+    generate_selector: GENERATING_SELECTOR
+    error: ERROR
+    close_browser: STOPPED
+    inject_code: INJECTING_CODE
+  PICKING:
+    generate_selector: GENERATING_SELECTOR
+    cancel_pick: READY
+    error: ERROR
+    close_browser: STOPPED
+  GENERATING_SELECTOR:
+    ready: READY
+    error: ERROR
+    close_browser: STOPPED
+  BROWSER_NOT_STARTED:
+    error_processed: STOPPED
+  BROWSER_NOT_READY:
+    error_processed: STARTED

@@ -2,22 +2,32 @@ from enum import Enum
 import uuid
 
 
-class ApplicationState(Enum):
+class BrowserState(Enum):
+    STOPPED = 'STOPPED'
+    STARTED = 'STARTED'
+    ERROR = 'ERROR'
+    INJECTING_CODE = 'INJECTING_CODE'
+    READY = 'READY'
+    PICKING = 'PICKING'
+    GENERATING_SELECTOR = 'GENERATING_SELECTOR'
     BROWSER_NOT_STARTED = 'BROWSER_NOT_STARTED'
-    BROWSER_RUNNING = 'BROWSER_RUNNING'
-    PICKING_ELEMENT = 'PICKING_ELEMENT'
-    UNEXPECTED_ERROR = 'UNEXPECTED_ERROR'
+    BROWSER_NOT_READY = 'BROWSER_NOT_READY'
 
 
 STATE_INDEX = {
-    'BROWSER_NOT_STARTED': 0,
-    'BROWSER_RUNNING': 1,
-    'PICKING_ELEMENT': 2,
-    'UNEXPECTED_ERROR': 3,
+    'STOPPED': 0,
+    'STARTED': 1,
+    'ERROR': 2,
+    'INJECTING_CODE': 3,
+    'READY': 4,
+    'PICKING': 5,
+    'GENERATING_SELECTOR': 6,
+    'BROWSER_NOT_STARTED': 7,
+    'BROWSER_NOT_READY': 8,
 }
 
 
-class ApplicationStateChangeEvent(object):
+class BrowserStateChangeEvent(object):
     """
     Event that gets on all the before/after callbacks that are
     triggered on state changes.
@@ -27,8 +37,8 @@ class ApplicationStateChangeEvent(object):
         """
         Create a new event.
 
-        :param ApplicationState previous_state: The state that the state machine is transitioning from.
-        :param ApplicationState target_state: The state that the state machine is transitioning to.
+        :param BrowserState previous_state: The state that the state machine is transitioning from.
+        :param BrowserState target_state: The state that the state machine is transitioning to.
         :param object data: Optional data that is passed in the event.
         """
         self._previousState = previous_state
@@ -67,7 +77,7 @@ class ApplicationStateChangeEvent(object):
         return self._targetState
 
 
-class ApplicationStateException(Exception):
+class BrowserStateException(Exception):
     pass
 
 
@@ -88,31 +98,58 @@ def register_transition(name, from_state, to_state):
 
     fromMap[name] = to_state
 
-register_transition('start_browser', ApplicationState.BROWSER_NOT_STARTED, ApplicationState.BROWSER_RUNNING)
-register_transition('pick_element', ApplicationState.BROWSER_RUNNING, ApplicationState.PICKING_ELEMENT)
-register_transition('close_browser', ApplicationState.BROWSER_RUNNING, ApplicationState.BROWSER_NOT_STARTED)
-register_transition('on_error', ApplicationState.BROWSER_RUNNING, ApplicationState.UNEXPECTED_ERROR)
-register_transition('cancel_picking', ApplicationState.PICKING_ELEMENT, ApplicationState.BROWSER_RUNNING)
-register_transition('on_error', ApplicationState.PICKING_ELEMENT, ApplicationState.UNEXPECTED_ERROR)
-register_transition('close_browser', ApplicationState.PICKING_ELEMENT, ApplicationState.BROWSER_NOT_STARTED)
-register_transition('ignore_error', ApplicationState.UNEXPECTED_ERROR, ApplicationState.BROWSER_RUNNING)
-register_transition('close_browser', ApplicationState.UNEXPECTED_ERROR, ApplicationState.BROWSER_NOT_STARTED)
+register_transition('start_browser', BrowserState.STOPPED, BrowserState.STARTED)
+register_transition('pick', BrowserState.STOPPED, BrowserState.BROWSER_NOT_STARTED)
+register_transition('inject_code', BrowserState.STARTED, BrowserState.INJECTING_CODE)
+register_transition('error', BrowserState.STARTED, BrowserState.ERROR)
+register_transition('close_browser', BrowserState.STARTED, BrowserState.STOPPED)
+register_transition('pick', BrowserState.STARTED, BrowserState.BROWSER_NOT_READY)
+register_transition('close_browser', BrowserState.ERROR, BrowserState.STOPPED)
+register_transition('error_processed', BrowserState.ERROR, BrowserState.STARTED)
+register_transition('ready', BrowserState.INJECTING_CODE, BrowserState.READY)
+register_transition('error', BrowserState.INJECTING_CODE, BrowserState.ERROR)
+register_transition('close_browser', BrowserState.INJECTING_CODE, BrowserState.STOPPED)
+register_transition('pick', BrowserState.INJECTING_CODE, BrowserState.BROWSER_NOT_READY)
+register_transition('highlight', BrowserState.INJECTING_CODE, BrowserState.BROWSER_NOT_READY)
+register_transition('pick', BrowserState.READY, BrowserState.PICKING)
+register_transition('generate_selector', BrowserState.READY, BrowserState.GENERATING_SELECTOR)
+register_transition('error', BrowserState.READY, BrowserState.ERROR)
+register_transition('close_browser', BrowserState.READY, BrowserState.STOPPED)
+register_transition('generate_selector', BrowserState.PICKING, BrowserState.GENERATING_SELECTOR)
+register_transition('cancel_pick', BrowserState.PICKING, BrowserState.READY)
+register_transition('error', BrowserState.PICKING, BrowserState.ERROR)
+register_transition('close_browser', BrowserState.PICKING, BrowserState.STOPPED)
+register_transition('ready', BrowserState.GENERATING_SELECTOR, BrowserState.READY)
+register_transition('error', BrowserState.GENERATING_SELECTOR, BrowserState.ERROR)
+register_transition('close_browser', BrowserState.GENERATING_SELECTOR, BrowserState.STOPPED)
+register_transition('error_processed', BrowserState.BROWSER_NOT_STARTED, BrowserState.STOPPED)
+register_transition('error_processed', BrowserState.BROWSER_NOT_READY, BrowserState.STARTED)
 
 
-class ApplicationStateMachine(object):
+class BrowserStateMachine(object):
     def __init__(self, initial_state=None):
         self._transition_listeners = dict()
         self._data_listeners = dict()
-        self._initial_state = initial_state or ApplicationState.BROWSER_NOT_STARTED
+        self._initial_state = initial_state or BrowserState.STOPPED
 
+        self._transition_listeners['STOPPED'] = EventListener()
+        self._transition_listeners['STARTED'] = EventListener()
+        self._transition_listeners['ERROR'] = EventListener()
+        self._transition_listeners['INJECTING_CODE'] = EventListener()
+        self._transition_listeners['READY'] = EventListener()
+        self._transition_listeners['PICKING'] = EventListener()
+        self._transition_listeners['GENERATING_SELECTOR'] = EventListener()
         self._transition_listeners['BROWSER_NOT_STARTED'] = EventListener()
-        self._transition_listeners['BROWSER_RUNNING'] = EventListener()
-        self._transition_listeners['PICKING_ELEMENT'] = EventListener()
-        self._transition_listeners['UNEXPECTED_ERROR'] = EventListener()
+        self._transition_listeners['BROWSER_NOT_READY'] = EventListener()
+        self._data_listeners['STOPPED'] = EventListener()
+        self._data_listeners['STARTED'] = EventListener()
+        self._data_listeners['ERROR'] = EventListener()
+        self._data_listeners['INJECTING_CODE'] = EventListener()
+        self._data_listeners['READY'] = EventListener()
+        self._data_listeners['PICKING'] = EventListener()
+        self._data_listeners['GENERATING_SELECTOR'] = EventListener()
         self._data_listeners['BROWSER_NOT_STARTED'] = EventListener()
-        self._data_listeners['BROWSER_RUNNING'] = EventListener()
-        self._data_listeners['PICKING_ELEMENT'] = EventListener()
-        self._data_listeners['UNEXPECTED_ERROR'] = EventListener()
+        self._data_listeners['BROWSER_NOT_READY'] = EventListener()
         self._currentState = None
         self._current_change_state_event = None
 
@@ -124,20 +161,32 @@ class ApplicationStateMachine(object):
     def start_browser(self, data=None):
         return self.transition("start_browser", data)
 
-    def pick_element(self, data=None):
-        return self.transition("pick_element", data)
+    def pick(self, data=None):
+        return self.transition("pick", data)
+
+    def inject_code(self, data=None):
+        return self.transition("inject_code", data)
+
+    def error(self, data=None):
+        return self.transition("error", data)
 
     def close_browser(self, data=None):
         return self.transition("close_browser", data)
 
-    def on_error(self, data=None):
-        return self.transition("on_error", data)
+    def error_processed(self, data=None):
+        return self.transition("error_processed", data)
 
-    def cancel_picking(self, data=None):
-        return self.transition("cancel_picking", data)
+    def ready(self, data=None):
+        return self.transition("ready", data)
 
-    def ignore_error(self, data=None):
-        return self.transition("ignore_error", data)
+    def highlight(self, data=None):
+        return self.transition("highlight", data)
+
+    def generate_selector(self, data=None):
+        return self.transition("generate_selector", data)
+
+    def cancel_pick(self, data=None):
+        return self.transition("cancel_pick", data)
 
     def _ensure_state_machine_initialized(self):
         if not self._currentState:
@@ -156,11 +205,11 @@ class ApplicationStateMachine(object):
         if targetState == self._currentState:
             return targetState
 
-        state_change_event = ApplicationStateChangeEvent(self._currentState, targetState, data)
+        state_change_event = BrowserStateChangeEvent(self._currentState, targetState, data)
 
         if self._current_change_state_event:
-            raise ApplicationStateException(
-                "The ApplicationStateMachine is already in a changeState (%s -> %s). "
+            raise BrowserStateException(
+                "The BrowserStateMachine is already in a changeState (%s -> %s). "
                 "Transitioning the state machine (%s -> %s) in `before` events is not supported." % (
                     self._current_change_state_event.previous_state.value,
                     self._current_change_state_event.target_state.value,
@@ -198,7 +247,7 @@ class ApplicationStateMachine(object):
 
         :param str link_name:
         :param object data:
-        :return: ApplicationState
+        :return: BrowserState
         """
         self._ensure_state_machine_initialized()
 
@@ -220,7 +269,7 @@ class ApplicationStateMachine(object):
         The transition can still be cancelled at this stage via `ev.cancel()`
         in the callback.
 
-        :param ApplicationState state:
+        :param BrowserState state:
         :param Function callback:
         :return:
         """
@@ -230,7 +279,7 @@ class ApplicationStateMachine(object):
         """
         Add a transition listener that will fire after the new state is entered.
         The transition can not be cancelled at this stage.
-        :param ApplicationState state:
+        :param BrowserState state:
         :param callback:
         :return:
         """
@@ -241,7 +290,7 @@ class ApplicationStateMachine(object):
         Add a transition listener that will fire before leaving a state.
         The transition can be cancelled at this stage via `ev.cancel()`.
 
-        :param ApplicationState state:
+        :param BrowserState state:
         :param callback:
         :return:
         """
@@ -252,7 +301,7 @@ class ApplicationStateMachine(object):
         Add a transition listener that will fire after leaving a state.
         The transition can not be cancelled at this stage.
 
-        :param ApplicationState state:
+        :param BrowserState state:
         :param callback:
         :return:
         """
@@ -262,7 +311,7 @@ class ApplicationStateMachine(object):
         """
         Add a data listener that will be called when data is being pushed for that transition.
 
-        :param ApplicationState state:
+        :param BrowserState state:
         :param callback:
         :return:
         """
@@ -359,12 +408,12 @@ class EventListener(object):
                 potential_result = callback.__call__(ev)
 
                 if potential_result and result:
-                    raise ApplicationStateException("Data is already returned")
+                    raise BrowserStateException("Data is already returned")
 
                 result = potential_result
             except Exception as e:
                 print e
-                if isinstance(e, ApplicationStateException):
+                if isinstance(e, BrowserStateException):
                     raise e
 
         return result
