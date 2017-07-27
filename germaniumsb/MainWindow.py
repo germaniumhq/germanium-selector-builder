@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'germaniumsb/MainWindow.ui'
 #
-# Created: Wed Jul 26 01:40:02 2017
+# Created: Wed Jul 26 07:59:20 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -41,6 +41,9 @@ class Ui_MainWindow(object):
         self.pickElementButton = QtGui.QPushButton(self.centralwidget)
         self.pickElementButton.setObjectName("pickElementButton")
         self.horizontalLayout.addWidget(self.pickElementButton)
+        self.cancelPickButton = QtGui.QPushButton(self.centralwidget)
+        self.cancelPickButton.setObjectName("cancelPickButton")
+        self.horizontalLayout.addWidget(self.cancelPickButton)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
         self.codeEdit = QtGui.QPlainTextEdit(self.centralwidget)
@@ -87,6 +90,7 @@ class Ui_MainWindow(object):
         self.stopBrowserButton.setText(QtGui.QApplication.translate("MainWindow", "Stop", None, QtGui.QApplication.UnicodeUTF8))
         self.highlightElementButton.setText(QtGui.QApplication.translate("MainWindow", "Highlight", None, QtGui.QApplication.UnicodeUTF8))
         self.pickElementButton.setText(QtGui.QApplication.translate("MainWindow", "Pick", None, QtGui.QApplication.UnicodeUTF8))
+        self.cancelPickButton.setText(QtGui.QApplication.translate("MainWindow", "Cancel Pick", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.menuExecute.setTitle(QtGui.QApplication.translate("MainWindow", "Execute", None, QtGui.QApplication.UnicodeUTF8))
         self.action_About.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))

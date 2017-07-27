@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Germanium Selector Builder</string>
+   <string>Germanium Selector Builder v2.0.5</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -67,6 +67,13 @@
          <widget class="QPushButton" name="pickElementButton">
           <property name="text">
            <string>Pick</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="cancelPickButton">
+          <property name="text">
+           <string>Cancel Pick</string>
           </property>
          </widget>
         </item>

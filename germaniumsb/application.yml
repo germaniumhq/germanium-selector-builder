@@ -1,0 +1,22 @@
+name: Application
+package: .
+states:
+  - BROWSER_NOT_STARTED
+  - BROWSER_RUNNING
+  - PICKING_ELEMENT
+  - UNEXPECTED_ERROR
+transitions:
+  BROWSER_NOT_STARTED:
+    start_browser: BROWSER_RUNNING
+  BROWSER_RUNNING:
+    pick_element: PICKING_ELEMENT
+    close_browser: BROWSER_NOT_STARTED
+    on_error: UNEXPECTED_ERROR
+  PICKING_ELEMENT:
+    cancel_picking: BROWSER_RUNNING
+    on_error: UNEXPECTED_ERROR
+    close_browser: BROWSER_NOT_STARTED
+  UNEXPECTED_ERROR:
+    ignore_error: BROWSER_RUNNING
+    close_browser: BROWSER_NOT_STARTED
+
