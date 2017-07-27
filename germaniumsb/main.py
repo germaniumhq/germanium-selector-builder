@@ -9,6 +9,7 @@ from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
 from germaniumsb.build_selector import build_selector
 from germaniumsb.code_editor import extract_code
 from germaniumsb.pick_element import pick_element
+from time import sleep
 
 BROWSERS=["Chrome", "Firefox", "IE"]
 
@@ -24,10 +25,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self._browser = BrowserStateMachine()
+        self.status_label = QLabel()
 
         self.setupUi(self)
         self.assign_widgets()
         self.show()
+
+        self._browser.application_initialized()
 
     def assign_widgets(self):
         for browser in BROWSERS:
@@ -41,31 +45,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         cancel_pick_shortcut = QShortcut(QKeySequence(self.tr("Escape", "Execute|Cancel Pick")),
                                          self)
 
-        self.startBrowserButton.show()
-        self.stopBrowserButton.hide()
-        self.pickElementButton.hide()
-        self.cancelPickButton.hide()
-        self.highlightElementButton.hide()
-
-        # start button
-        self._browser.after_enter(BrowserState.STOPPED, _(self.startBrowserButton.show))
-        self._browser.after_leave(BrowserState.STOPPED, _(self.startBrowserButton.hide))
-
-        # stop button
-        self._browser.after_enter(BrowserState.STOPPED, _(self.stopBrowserButton.hide))
-        self._browser.after_leave(BrowserState.STOPPED, _(self.stopBrowserButton.show))
-
-        # highlight button
-        self._browser.after_leave(BrowserState.STOPPED, _(self.highlightElementButton.show))
-        self._browser.after_enter(BrowserState.STOPPED, _(self.highlightElementButton.hide))
-
-        # pick button
-        self._browser.after_enter(BrowserState.READY, _(self.pickElementButton.show))
-        self._browser.after_leave(BrowserState.READY, _(self.pickElementButton.hide))
-
-        # cancel pick button
-        self._browser.after_enter(BrowserState.PICKING, _(self.cancelPickButton.show))
-        self._browser.after_leave(BrowserState.PICKING, _(self.cancelPickButton.hide))
+        self._setup_buttons_visibilities()
+        self._show_application_status()
 
         # actual actions mapped on the transitions
         self._browser.before_enter(BrowserState.STOPPED, _(self.stop_browser))
@@ -75,6 +56,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.after_enter(BrowserState.PICKING, _(self.pick_element))
         self._browser.after_enter(BrowserState.BROWSER_NOT_STARTED, _(self.browser_not_available))
         self._browser.after_enter(BrowserState.BROWSER_NOT_READY, _(self.browser_not_available))
+
+        self.statusbar.addWidget(QLabel("Status:"))
+        self.statusbar.addWidget(self.status_label)
+
 
         # self.codeEdit.setPlainText(build_selector(element))
 
@@ -93,6 +78,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # this shouldn't need a new state
         self.highlightElementButton.clicked.connect(_(self.on_highlight_local_entry))
         highlight_shortcut.activated.connect(_(self.on_highlight_local_entry))
+
+    def _show_application_status(self):
+        self._browser.after_enter(BrowserState.STOPPED, lambda ev: self.status_label.setText("Browser stopped"))
+        self._browser.after_enter(BrowserState.STARTED, lambda ev: self.status_label.setText("Browser starting..."))
+        self._browser.after_enter(BrowserState.READY, lambda ev: self.status_label.setText('Ready'))
+        self._browser.after_enter(BrowserState.PICKING, lambda ev: self.status_label.setText("Picking element..."))
+        self._browser.after_enter(BrowserState.GENERATING_SELECTOR,
+                                  lambda ev: self.status_label.setText("Computing selector..."))
+
+    def _setup_buttons_visibilities(self):
+        self.startBrowserButton.show()
+        self.stopBrowserButton.hide()
+        self.pickElementButton.hide()
+        self.cancelPickButton.hide()
+        self.highlightElementButton.hide()
+        # start button
+        self._browser.after_enter(BrowserState.STOPPED, _(self.startBrowserButton.show))
+        self._browser.after_leave(BrowserState.STOPPED, _(self.startBrowserButton.hide))
+        # stop button
+        self._browser.after_enter(BrowserState.STOPPED, _(self.stopBrowserButton.hide))
+        self._browser.after_leave(BrowserState.STOPPED, _(self.stopBrowserButton.show))
+        # highlight button
+        self._browser.after_leave(BrowserState.STOPPED, _(self.highlightElementButton.show))
+        self._browser.after_enter(BrowserState.STOPPED, _(self.highlightElementButton.hide))
+        # pick button
+        self._browser.after_enter(BrowserState.READY, _(self.pickElementButton.show))
+        self._browser.after_leave(BrowserState.READY, _(self.pickElementButton.hide))
+        # cancel pick button
+        self._browser.after_enter(BrowserState.PICKING, _(self.cancelPickButton.show))
+        self._browser.after_leave(BrowserState.PICKING, _(self.cancelPickButton.hide))
 
     def start_browser(self):
         try:

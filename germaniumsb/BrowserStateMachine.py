@@ -3,6 +3,7 @@ import uuid
 
 
 class BrowserState(Enum):
+    NOT_INITIALIZED = 'NOT_INITIALIZED'
     STOPPED = 'STOPPED'
     STARTED = 'STARTED'
     ERROR = 'ERROR'
@@ -15,15 +16,16 @@ class BrowserState(Enum):
 
 
 STATE_INDEX = {
-    'STOPPED': 0,
-    'STARTED': 1,
-    'ERROR': 2,
-    'INJECTING_CODE': 3,
-    'READY': 4,
-    'PICKING': 5,
-    'GENERATING_SELECTOR': 6,
-    'BROWSER_NOT_STARTED': 7,
-    'BROWSER_NOT_READY': 8,
+    'NOT_INITIALIZED': 0,
+    'STOPPED': 1,
+    'STARTED': 2,
+    'ERROR': 3,
+    'INJECTING_CODE': 4,
+    'READY': 5,
+    'PICKING': 6,
+    'GENERATING_SELECTOR': 7,
+    'BROWSER_NOT_STARTED': 8,
+    'BROWSER_NOT_READY': 9,
 }
 
 
@@ -98,6 +100,7 @@ def register_transition(name, from_state, to_state):
 
     fromMap[name] = to_state
 
+register_transition('application_initialized', BrowserState.NOT_INITIALIZED, BrowserState.STOPPED)
 register_transition('start_browser', BrowserState.STOPPED, BrowserState.STARTED)
 register_transition('pick', BrowserState.STOPPED, BrowserState.BROWSER_NOT_STARTED)
 register_transition('inject_code', BrowserState.STARTED, BrowserState.INJECTING_CODE)
@@ -115,6 +118,7 @@ register_transition('pick', BrowserState.READY, BrowserState.PICKING)
 register_transition('generate_selector', BrowserState.READY, BrowserState.GENERATING_SELECTOR)
 register_transition('error', BrowserState.READY, BrowserState.ERROR)
 register_transition('close_browser', BrowserState.READY, BrowserState.STOPPED)
+register_transition('inject_code', BrowserState.READY, BrowserState.INJECTING_CODE)
 register_transition('generate_selector', BrowserState.PICKING, BrowserState.GENERATING_SELECTOR)
 register_transition('cancel_pick', BrowserState.PICKING, BrowserState.READY)
 register_transition('error', BrowserState.PICKING, BrowserState.ERROR)
@@ -130,8 +134,9 @@ class BrowserStateMachine(object):
     def __init__(self, initial_state=None):
         self._transition_listeners = dict()
         self._data_listeners = dict()
-        self._initial_state = initial_state or BrowserState.STOPPED
+        self._initial_state = initial_state or BrowserState.NOT_INITIALIZED
 
+        self._transition_listeners['NOT_INITIALIZED'] = EventListener()
         self._transition_listeners['STOPPED'] = EventListener()
         self._transition_listeners['STARTED'] = EventListener()
         self._transition_listeners['ERROR'] = EventListener()
@@ -141,6 +146,7 @@ class BrowserStateMachine(object):
         self._transition_listeners['GENERATING_SELECTOR'] = EventListener()
         self._transition_listeners['BROWSER_NOT_STARTED'] = EventListener()
         self._transition_listeners['BROWSER_NOT_READY'] = EventListener()
+        self._data_listeners['NOT_INITIALIZED'] = EventListener()
         self._data_listeners['STOPPED'] = EventListener()
         self._data_listeners['STARTED'] = EventListener()
         self._data_listeners['ERROR'] = EventListener()
@@ -157,6 +163,9 @@ class BrowserStateMachine(object):
     def state(self):
         self._ensure_state_machine_initialized()
         return self._currentState
+
+    def application_initialized(self, data=None):
+        return self.transition("application_initialized", data)
 
     def start_browser(self, data=None):
         return self.transition("start_browser", data)

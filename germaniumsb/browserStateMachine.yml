@@ -1,6 +1,7 @@
 name: Browser
 package: .
 states:
+  - NOT_INITIALIZED
   - STOPPED
   - STARTED
   - ERROR
@@ -11,6 +12,8 @@ states:
   - BROWSER_NOT_STARTED
   - BROWSER_NOT_READY
 transitions:
+  NOT_INITIALIZED:
+    application_initialized: STOPPED
   STOPPED:
     start_browser: STARTED
     pick: BROWSER_NOT_STARTED
