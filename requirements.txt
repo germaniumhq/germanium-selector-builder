@@ -1,0 +1,3 @@
+PySide==1.2.4
+germanium==2.0.6
+

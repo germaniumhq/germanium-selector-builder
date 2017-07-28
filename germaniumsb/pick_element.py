@@ -1,7 +1,6 @@
 from germanium.static import *
 
-def pick_element():
-    return Element('body').element()
 
-def unpick_element():
-    return
+def get_picked_element():
+    print("search for elements")
+    return None

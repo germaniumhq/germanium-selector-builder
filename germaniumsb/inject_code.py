@@ -1,4 +1,5 @@
 from germanium.static import *
+import pkg_resources
 
 
 def inject_into_current_document(error_messages=None):
@@ -11,11 +12,13 @@ def inject_into_current_document(error_messages=None):
     error_happened = False
     error_messages = error_messages if error_messages else []
 
-    find_element_script = ""
+    script = pkg_resources.resource_string(__name__, "../js/find_element_script.js")
+    if type(script) != 'str':  # it is bytes
+        script = script.decode('utf-8')
 
     try:
-        if not js('return __germanium_loaded;'):
-            js(find_element_script)
+        if not js('return window["__germanium_loaded"];'):
+            js(script)
     except Exception as e:
         print(e)
         error_messages.append(str(e))

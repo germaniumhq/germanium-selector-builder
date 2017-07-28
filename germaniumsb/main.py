@@ -9,8 +9,9 @@ from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
 from germaniumsb.build_selector import build_selector
 from germaniumsb.code_editor import extract_code
 from germaniumsb.inject_code import inject_into_current_document
-from germaniumsb.pick_element import pick_element
 from time import sleep
+
+from germaniumsb.pick_element import get_picked_element
 
 BROWSERS=["Chrome", "Firefox", "IE"]
 
@@ -33,6 +34,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__()
         self._browser = BrowserStateMachine()
         self.status_label = QLabel()
+        self.pick_timer = QTimer(self)
 
         self.setupUi(self)
         self.assign_widgets()
@@ -68,6 +70,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusbar.addWidget(QLabel("Status:"))
         self.statusbar.addWidget(self.status_label)
 
+        def timer_leave_state(ev):
+            if ev.target_state != BrowserState.READY and ev.target_state != BrowserState.PICKING:
+                self.pick_timer.stop()
+
+        self._browser.after_enter(BrowserState.READY, _(lambda: self.pick_timer.start(2000)))
+        self._browser.before_leave(BrowserState.READY, timer_leave_state)
 
         # self.codeEdit.setPlainText(build_selector(element))
 
@@ -86,6 +94,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # this shouldn't need a new state
         self.highlightElementButton.clicked.connect(_(self.on_highlight_local_entry))
         highlight_shortcut.activated.connect(_(self.on_highlight_local_entry))
+
+        self.pick_timer.timeout.connect(_(self.on_pick_timer))
 
     def _show_application_status(self):
         self._browser.after_enter(BrowserState.STOPPED,
@@ -135,6 +145,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return BrowserState.STOPPED
 
     def stop_browser(self):
+        """
+        Code called when we're supposed to tear down the browser.
+        :return:
+        """
         close_browser()
 
     def inject_code(self):
@@ -166,9 +180,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         if error_message.exec_() == QMessageBox.Close:
             self._browser.close_browser()
+            return
 
         self._browser.error_processed()
 
+    def on_pick_timer(self):
+        element = get_picked_element()
+
+        if not element:
+            return
+
+        self._browser.generate_selector(element)
 
     def pick_element(self):
         pass
