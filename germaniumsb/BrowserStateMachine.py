@@ -8,6 +8,7 @@ class BrowserState(Enum):
     STARTED = 'STARTED'
     ERROR = 'ERROR'
     INJECTING_CODE = 'INJECTING_CODE'
+    INJECTING_CODE_FAILED = 'INJECTING_CODE_FAILED'
     READY = 'READY'
     PICKING = 'PICKING'
     GENERATING_SELECTOR = 'GENERATING_SELECTOR'
@@ -21,11 +22,12 @@ STATE_INDEX = {
     'STARTED': 2,
     'ERROR': 3,
     'INJECTING_CODE': 4,
-    'READY': 5,
-    'PICKING': 6,
-    'GENERATING_SELECTOR': 7,
-    'BROWSER_NOT_STARTED': 8,
-    'BROWSER_NOT_READY': 9,
+    'INJECTING_CODE_FAILED': 5,
+    'READY': 6,
+    'PICKING': 7,
+    'GENERATING_SELECTOR': 8,
+    'BROWSER_NOT_STARTED': 9,
+    'BROWSER_NOT_READY': 10,
 }
 
 
@@ -110,10 +112,12 @@ register_transition('pick', BrowserState.STARTED, BrowserState.BROWSER_NOT_READY
 register_transition('close_browser', BrowserState.ERROR, BrowserState.STOPPED)
 register_transition('error_processed', BrowserState.ERROR, BrowserState.STARTED)
 register_transition('ready', BrowserState.INJECTING_CODE, BrowserState.READY)
-register_transition('error', BrowserState.INJECTING_CODE, BrowserState.ERROR)
+register_transition('error_injecting_code', BrowserState.INJECTING_CODE, BrowserState.INJECTING_CODE_FAILED)
 register_transition('close_browser', BrowserState.INJECTING_CODE, BrowserState.STOPPED)
 register_transition('pick', BrowserState.INJECTING_CODE, BrowserState.BROWSER_NOT_READY)
-register_transition('highlight', BrowserState.INJECTING_CODE, BrowserState.BROWSER_NOT_READY)
+register_transition('ready', BrowserState.INJECTING_CODE_FAILED, BrowserState.READY)
+register_transition('error_processed', BrowserState.INJECTING_CODE_FAILED, BrowserState.READY)
+register_transition('close_browser', BrowserState.INJECTING_CODE_FAILED, BrowserState.STOPPED)
 register_transition('pick', BrowserState.READY, BrowserState.PICKING)
 register_transition('generate_selector', BrowserState.READY, BrowserState.GENERATING_SELECTOR)
 register_transition('error', BrowserState.READY, BrowserState.ERROR)
@@ -141,6 +145,7 @@ class BrowserStateMachine(object):
         self._transition_listeners['STARTED'] = EventListener()
         self._transition_listeners['ERROR'] = EventListener()
         self._transition_listeners['INJECTING_CODE'] = EventListener()
+        self._transition_listeners['INJECTING_CODE_FAILED'] = EventListener()
         self._transition_listeners['READY'] = EventListener()
         self._transition_listeners['PICKING'] = EventListener()
         self._transition_listeners['GENERATING_SELECTOR'] = EventListener()
@@ -151,6 +156,7 @@ class BrowserStateMachine(object):
         self._data_listeners['STARTED'] = EventListener()
         self._data_listeners['ERROR'] = EventListener()
         self._data_listeners['INJECTING_CODE'] = EventListener()
+        self._data_listeners['INJECTING_CODE_FAILED'] = EventListener()
         self._data_listeners['READY'] = EventListener()
         self._data_listeners['PICKING'] = EventListener()
         self._data_listeners['GENERATING_SELECTOR'] = EventListener()
@@ -188,8 +194,8 @@ class BrowserStateMachine(object):
     def ready(self, data=None):
         return self.transition("ready", data)
 
-    def highlight(self, data=None):
-        return self.transition("highlight", data)
+    def error_injecting_code(self, data=None):
+        return self.transition("error_injecting_code", data)
 
     def generate_selector(self, data=None):
         return self.transition("generate_selector", data)

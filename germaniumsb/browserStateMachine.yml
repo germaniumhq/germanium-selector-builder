@@ -6,6 +6,7 @@ states:
   - STARTED
   - ERROR
   - INJECTING_CODE
+  - INJECTING_CODE_FAILED
   - READY
   - PICKING
   - GENERATING_SELECTOR
@@ -27,10 +28,13 @@ transitions:
     error_processed: STARTED
   INJECTING_CODE:
     ready: READY
-    error: ERROR
+    error_injecting_code: INJECTING_CODE_FAILED
     close_browser: STOPPED
     pick: BROWSER_NOT_READY
-    highlight: BROWSER_NOT_READY
+  INJECTING_CODE_FAILED:
+    ready: READY
+    error_processed: READY
+    close_browser: STOPPED
   READY:
     pick: PICKING
     generate_selector: GENERATING_SELECTOR

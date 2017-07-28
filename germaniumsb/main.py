@@ -8,6 +8,7 @@ import traceback
 from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
 from germaniumsb.build_selector import build_selector
 from germaniumsb.code_editor import extract_code
+from germaniumsb.inject_code import inject_into_current_document
 from germaniumsb.pick_element import pick_element
 from time import sleep
 
@@ -15,6 +16,12 @@ BROWSERS=["Chrome", "Firefox", "IE"]
 
 
 def _(callable):
+    """
+    Make a new callable that ignores all its parameters, and just calls the
+    given callable.
+    :param callable:
+    :return:
+    """
     def ignore_args(*args, **kw):
         return callable()
 
@@ -56,6 +63,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.after_enter(BrowserState.PICKING, _(self.pick_element))
         self._browser.after_enter(BrowserState.BROWSER_NOT_STARTED, _(self.browser_not_available))
         self._browser.after_enter(BrowserState.BROWSER_NOT_READY, _(self.browser_not_available))
+        self._browser.after_enter(BrowserState.INJECTING_CODE_FAILED, self.injecting_code_failed)
 
         self.statusbar.addWidget(QLabel("Status:"))
         self.statusbar.addWidget(self.status_label)
@@ -80,10 +88,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         highlight_shortcut.activated.connect(_(self.on_highlight_local_entry))
 
     def _show_application_status(self):
-        self._browser.after_enter(BrowserState.STOPPED, lambda ev: self.status_label.setText("Browser stopped"))
-        self._browser.after_enter(BrowserState.STARTED, lambda ev: self.status_label.setText("Browser starting..."))
-        self._browser.after_enter(BrowserState.READY, lambda ev: self.status_label.setText('Ready'))
-        self._browser.after_enter(BrowserState.PICKING, lambda ev: self.status_label.setText("Picking element..."))
+        self._browser.after_enter(BrowserState.STOPPED,
+                                  lambda ev: self.status_label.setText("Browser stopped"))
+        self._browser.after_enter(BrowserState.STARTED,
+                                  lambda ev: self.status_label.setText("Browser starting..."))
+        self._browser.after_enter(BrowserState.READY,
+                                  lambda ev: self.status_label.setText('Ready'))
+        self._browser.after_enter(BrowserState.PICKING,
+                                  lambda ev: self.status_label.setText("Picking element..."))
         self._browser.after_enter(BrowserState.GENERATING_SELECTOR,
                                   lambda ev: self.status_label.setText("Computing selector..."))
 
@@ -126,7 +138,37 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         close_browser()
 
     def inject_code(self):
+        error_happened, error_messages = inject_into_current_document()
+
+        if error_happened:
+            self._browser.error_injecting_code(error_messages)
+            return
+
         self._browser.ready()
+
+    def injecting_code_failed(self, ev):
+        """
+        This code will be called when the injection will fail
+        for a document several times.
+
+        :param ev:
+        :return:
+        """
+        error_message = QMessageBox()
+        error_message.setWindowTitle(self.tr("Unable to observe browser"))
+        error_message.setText(self.tr("Germanium was unable observe one "
+                                      "or more documents in the browser."))
+        error_message.setDetailedText("\n".join(ev.data))
+        error_message.setIcon(QMessageBox.Critical)
+        error_message.setStandardButtons(QMessageBox.Close | QMessageBox.Ignore)
+        error_message.setEscapeButton(QMessageBox.Ignore)
+        error_message.setDefaultButton(QMessageBox.Ignore)
+
+        if error_message.exec_() == QMessageBox.Close:
+            self._browser.close_browser()
+
+        self._browser.error_processed()
+
 
     def pick_element(self):
         pass
