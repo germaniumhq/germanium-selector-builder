@@ -8,7 +8,7 @@ import traceback
 from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
 from germaniumsb.build_selector import build_selector
 from germaniumsb.code_editor import extract_code
-from germaniumsb.inject_code import inject_into_current_document
+from germaniumsb.inject_code import inject_into_current_document, is_germaniumsb_injected
 from time import sleep
 
 from germaniumsb.pick_element import get_picked_element
@@ -70,12 +70,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusbar.addWidget(QLabel("Status:"))
         self.statusbar.addWidget(self.status_label)
 
+
         def timer_leave_state(ev):
-            if ev.target_state != BrowserState.READY and ev.target_state != BrowserState.PICKING:
+            if ev.target_state != BrowserState.READY and \
+               ev.target_state != BrowserState.PICKING:
                 self.pick_timer.stop()
 
         self._browser.after_enter(BrowserState.READY, _(lambda: self.pick_timer.start(2000)))
         self._browser.before_leave(BrowserState.READY, timer_leave_state)
+        self._browser.before_leave(BrowserState.PICKING, timer_leave_state)
 
         # self.codeEdit.setPlainText(build_selector(element))
 
@@ -91,6 +94,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.cancelPickButton.clicked.connect(_(self._browser.cancel_pick))
         cancel_pick_shortcut.activated.connect(_(self._browser.cancel_pick))
 
+        self.liveButton.clicked.connect(_(self._browser.toggle_pause))
+
         # this shouldn't need a new state
         self.highlightElementButton.clicked.connect(_(self.on_highlight_local_entry))
         highlight_shortcut.activated.connect(_(self.on_highlight_local_entry))
@@ -98,16 +103,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pick_timer.timeout.connect(_(self.on_pick_timer))
 
     def _show_application_status(self):
-        self._browser.after_enter(BrowserState.STOPPED,
-                                  lambda ev: self.status_label.setText("Browser stopped"))
-        self._browser.after_enter(BrowserState.STARTED,
-                                  lambda ev: self.status_label.setText("Browser starting..."))
-        self._browser.after_enter(BrowserState.READY,
-                                  lambda ev: self.status_label.setText('Ready'))
-        self._browser.after_enter(BrowserState.PICKING,
-                                  lambda ev: self.status_label.setText("Picking element..."))
-        self._browser.after_enter(BrowserState.GENERATING_SELECTOR,
-                                  lambda ev: self.status_label.setText("Computing selector..."))
+        self._browser.before_enter(BrowserState.STOPPED,
+                                   lambda ev: self.status_label.setText("Browser stopped"))
+        self._browser.before_enter(BrowserState.STARTED,
+                                   lambda ev: self.status_label.setText("Browser starting..."))
+        self._browser.before_enter(BrowserState.INJECTING_CODE,
+                                   lambda ev: self.status_label.setText("Loading monitoring..."))
+        self._browser.before_enter(BrowserState.READY,
+                                   lambda ev: self.status_label.setText('Ready'))
+        self._browser.before_enter(BrowserState.PICKING,
+                                   lambda ev: self.status_label.setText("Picking element..."))
+        self._browser.before_enter(BrowserState.PAUSED,
+                                   lambda ev: self.status_label.setText('Paused'))
+        self._browser.before_enter(BrowserState.GENERATING_SELECTOR,
+                                   lambda ev: self.status_label.setText("Computing selector..."))
 
     def _setup_buttons_visibilities(self):
         self.startBrowserButton.show()
@@ -115,6 +124,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pickElementButton.hide()
         self.cancelPickButton.hide()
         self.highlightElementButton.hide()
+        self.liveButton.hide()
         # start button
         self._browser.after_enter(BrowserState.STOPPED, _(self.startBrowserButton.show))
         self._browser.after_leave(BrowserState.STOPPED, _(self.startBrowserButton.hide))
@@ -124,12 +134,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # highlight button
         self._browser.after_leave(BrowserState.STOPPED, _(self.highlightElementButton.show))
         self._browser.after_enter(BrowserState.STOPPED, _(self.highlightElementButton.hide))
+        self._browser.after_leave(BrowserState.PAUSED, _(self.highlightElementButton.show))
+        self._browser.after_enter(BrowserState.PAUSED, _(self.highlightElementButton.hide))
         # pick button
         self._browser.after_enter(BrowserState.READY, _(self.pickElementButton.show))
         self._browser.after_leave(BrowserState.READY, _(self.pickElementButton.hide))
         # cancel pick button
         self._browser.after_enter(BrowserState.PICKING, _(self.cancelPickButton.show))
         self._browser.after_leave(BrowserState.PICKING, _(self.cancelPickButton.hide))
+
+        # pause button
+        def live_leave_state(ev):
+            if ev.target_state not in (BrowserState.READY,
+                                   BrowserState.PICKING,
+                                   BrowserState.PAUSED,
+                                   BrowserState.GENERATING_SELECTOR):
+                self.liveButton.hide()
+
+        self._browser.after_enter(BrowserState.READY, _(self.liveButton.show))
+        self._browser.after_leave(BrowserState.READY, live_leave_state)
+        self._browser.after_leave(BrowserState.PICKING, live_leave_state)
+        self._browser.after_leave(BrowserState.PAUSED, live_leave_state)
+        self._browser.after_leave(BrowserState.GENERATING_SELECTOR, live_leave_state)
 
     def start_browser(self):
         try:
@@ -185,6 +211,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.error_processed()
 
     def on_pick_timer(self):
+        if not is_germaniumsb_injected():
+            self._browser.inject_code()
+            return
+
         element = get_picked_element()
 
         if not element:

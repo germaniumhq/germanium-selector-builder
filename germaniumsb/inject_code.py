@@ -17,7 +17,7 @@ def inject_into_current_document(error_messages=None):
         script = script.decode('utf-8')
 
     try:
-        if not js('return window["__germanium_loaded"];'):
+        if not is_germaniumsb_injected():
             js(script)
     except Exception as e:
         print(e)
@@ -29,3 +29,7 @@ def inject_into_current_document(error_messages=None):
         error_happened |= inject_into_current_document(error_messages)
 
     return error_happened, error_messages
+
+
+def is_germaniumsb_injected():
+    return js('return window["__germanium_loaded"];')

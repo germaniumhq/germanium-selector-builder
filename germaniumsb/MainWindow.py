@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'germaniumsb/MainWindow.ui'
 #
-# Created: Fri Jul 28 23:52:48 2017
+# Created: Sat Jul 29 23:19:50 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -35,6 +35,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.stopBrowserButton)
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
+        self.liveButton = QtGui.QPushButton(self.centralwidget)
+        self.liveButton.setCheckable(True)
+        self.liveButton.setChecked(True)
+        self.liveButton.setObjectName("liveButton")
+        self.horizontalLayout.addWidget(self.liveButton)
         self.highlightElementButton = QtGui.QPushButton(self.centralwidget)
         self.highlightElementButton.setObjectName("highlightElementButton")
         self.horizontalLayout.addWidget(self.highlightElementButton)
@@ -88,6 +93,7 @@ class Ui_MainWindow(object):
         self.browserLabel.setText(QtGui.QApplication.translate("MainWindow", "Browser:", None, QtGui.QApplication.UnicodeUTF8))
         self.startBrowserButton.setText(QtGui.QApplication.translate("MainWindow", "Start", None, QtGui.QApplication.UnicodeUTF8))
         self.stopBrowserButton.setText(QtGui.QApplication.translate("MainWindow", "Stop", None, QtGui.QApplication.UnicodeUTF8))
+        self.liveButton.setText(QtGui.QApplication.translate("MainWindow", "Live", None, QtGui.QApplication.UnicodeUTF8))
         self.highlightElementButton.setText(QtGui.QApplication.translate("MainWindow", "Highlight", None, QtGui.QApplication.UnicodeUTF8))
         self.pickElementButton.setText(QtGui.QApplication.translate("MainWindow", "Pick", None, QtGui.QApplication.UnicodeUTF8))
         self.cancelPickButton.setText(QtGui.QApplication.translate("MainWindow", "Cancel Pick", None, QtGui.QApplication.UnicodeUTF8))

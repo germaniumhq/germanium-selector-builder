@@ -57,6 +57,19 @@
          </spacer>
         </item>
         <item>
+         <widget class="QPushButton" name="liveButton">
+          <property name="text">
+           <string>Live</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="highlightElementButton">
           <property name="text">
            <string>Highlight</string>

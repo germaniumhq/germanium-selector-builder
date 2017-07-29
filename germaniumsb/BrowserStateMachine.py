@@ -12,6 +12,7 @@ class BrowserState(Enum):
     READY = 'READY'
     PICKING = 'PICKING'
     GENERATING_SELECTOR = 'GENERATING_SELECTOR'
+    PAUSED = 'PAUSED'
     BROWSER_NOT_STARTED = 'BROWSER_NOT_STARTED'
     BROWSER_NOT_READY = 'BROWSER_NOT_READY'
 
@@ -26,8 +27,9 @@ STATE_INDEX = {
     'READY': 6,
     'PICKING': 7,
     'GENERATING_SELECTOR': 8,
-    'BROWSER_NOT_STARTED': 9,
-    'BROWSER_NOT_READY': 10,
+    'PAUSED': 9,
+    'BROWSER_NOT_STARTED': 10,
+    'BROWSER_NOT_READY': 11,
 }
 
 
@@ -123,10 +125,13 @@ register_transition('generate_selector', BrowserState.READY, BrowserState.GENERA
 register_transition('error', BrowserState.READY, BrowserState.ERROR)
 register_transition('close_browser', BrowserState.READY, BrowserState.STOPPED)
 register_transition('inject_code', BrowserState.READY, BrowserState.INJECTING_CODE)
+register_transition('toggle_pause', BrowserState.READY, BrowserState.PAUSED)
 register_transition('generate_selector', BrowserState.PICKING, BrowserState.GENERATING_SELECTOR)
 register_transition('cancel_pick', BrowserState.PICKING, BrowserState.READY)
 register_transition('error', BrowserState.PICKING, BrowserState.ERROR)
 register_transition('close_browser', BrowserState.PICKING, BrowserState.STOPPED)
+register_transition('toggle_pause', BrowserState.PICKING, BrowserState.PAUSED)
+register_transition('toggle_pause', BrowserState.PAUSED, BrowserState.READY)
 register_transition('ready', BrowserState.GENERATING_SELECTOR, BrowserState.READY)
 register_transition('error', BrowserState.GENERATING_SELECTOR, BrowserState.ERROR)
 register_transition('close_browser', BrowserState.GENERATING_SELECTOR, BrowserState.STOPPED)
@@ -149,6 +154,7 @@ class BrowserStateMachine(object):
         self._transition_listeners['READY'] = EventListener()
         self._transition_listeners['PICKING'] = EventListener()
         self._transition_listeners['GENERATING_SELECTOR'] = EventListener()
+        self._transition_listeners['PAUSED'] = EventListener()
         self._transition_listeners['BROWSER_NOT_STARTED'] = EventListener()
         self._transition_listeners['BROWSER_NOT_READY'] = EventListener()
         self._data_listeners['NOT_INITIALIZED'] = EventListener()
@@ -160,6 +166,7 @@ class BrowserStateMachine(object):
         self._data_listeners['READY'] = EventListener()
         self._data_listeners['PICKING'] = EventListener()
         self._data_listeners['GENERATING_SELECTOR'] = EventListener()
+        self._data_listeners['PAUSED'] = EventListener()
         self._data_listeners['BROWSER_NOT_STARTED'] = EventListener()
         self._data_listeners['BROWSER_NOT_READY'] = EventListener()
         self._currentState = None
@@ -199,6 +206,9 @@ class BrowserStateMachine(object):
 
     def generate_selector(self, data=None):
         return self.transition("generate_selector", data)
+
+    def toggle_pause(self, data=None):
+        return self.transition("toggle_pause", data)
 
     def cancel_pick(self, data=None):
         return self.transition("cancel_pick", data)

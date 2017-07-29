@@ -10,6 +10,7 @@ states:
   - READY
   - PICKING
   - GENERATING_SELECTOR
+  - PAUSED
   - BROWSER_NOT_STARTED
   - BROWSER_NOT_READY
 transitions:
@@ -41,11 +42,15 @@ transitions:
     error: ERROR
     close_browser: STOPPED
     inject_code: INJECTING_CODE
+    toggle_pause: PAUSED
   PICKING:
     generate_selector: GENERATING_SELECTOR
     cancel_pick: READY
     error: ERROR
     close_browser: STOPPED
+    toggle_pause: PAUSED
+  PAUSED:
+    toggle_pause: READY
   GENERATING_SELECTOR:
     ready: READY
     error: ERROR
