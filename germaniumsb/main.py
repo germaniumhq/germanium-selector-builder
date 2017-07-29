@@ -7,9 +7,8 @@ import traceback
 
 from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
 from germaniumsb.build_selector import build_selector
-from germaniumsb.code_editor import extract_code
+from germaniumsb.code_editor import extract_code, insert_code_into_editor
 from germaniumsb.inject_code import inject_into_current_document, is_germaniumsb_injected
-from time import sleep
 
 from germaniumsb.pick_element import get_picked_element
 
@@ -66,6 +65,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.after_enter(BrowserState.BROWSER_NOT_STARTED, _(self.browser_not_available))
         self._browser.after_enter(BrowserState.BROWSER_NOT_READY, _(self.browser_not_available))
         self._browser.after_enter(BrowserState.INJECTING_CODE_FAILED, self.injecting_code_failed)
+
+        self._browser.after_enter(BrowserState.GENERATING_SELECTOR, self.generate_selector)
 
         self.statusbar.addWidget(QLabel("Status:"))
         self.statusbar.addWidget(self.status_label)
@@ -221,6 +222,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
 
         self._browser.generate_selector(element)
+
+    def generate_selector(self, ev):
+        element = ev.data
+        text_selector = build_selector(element)
+        text_cursor = self.codeEdit.textCursor()
+
+        insert_code_into_editor(text_cursor, text_selector)
+        self._browser.ready()
 
     def pick_element(self):
         pass

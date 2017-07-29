@@ -8,7 +8,8 @@ def get_picked_element():
     :return:
     """
     try:
-        element = js('return window["__germanium_element"];')
+        get_germanium().switch_to.default_content()
+        element = js('var element = window["__germanium_element"]; window["__germanium_element"] = null; return element;')
         if element:
             return element
     except Exception as e:
