@@ -65,6 +65,9 @@ def is_inside_table(element):
 
 
 def selector_to_string(selector):
+    # if not selector:
+    #     return "# unable to build selector"
+
     result = 'Element("%s"' % selector.tag_name
 
     if selector.exact_attributes:

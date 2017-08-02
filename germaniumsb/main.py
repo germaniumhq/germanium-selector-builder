@@ -74,6 +74,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self._browser.after_enter(BrowserState.GENERATING_SELECTOR, self.generate_selector)
 
+        self._browser.after_enter(BrowserState.ERROR, self.on_error)
+
         self.statusbar.addWidget(QLabel("Status:"))
         self.statusbar.addWidget(self.status_label)
 
@@ -123,6 +125,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                    lambda ev: self.status_label.setText('Paused'))
         self._browser.before_enter(BrowserState.GENERATING_SELECTOR,
                                    lambda ev: self.status_label.setText("Computing selector..."))
+        self._browser.before_enter(BrowserState.ERROR,
+                                   lambda ev: self.status_label.setText("Error :( ..."))
 
     def _setup_buttons_visibilities(self):
         self.startBrowserButton.show()
@@ -247,12 +251,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.generate_selector(element)
 
     def generate_selector(self, ev):
-        element = ev.data
-        text_selector = build_selector(element)
-        text_cursor = self.codeEdit.textCursor()
+        try:
+            element = ev.data
+            text_selector = build_selector(element)
+            text_cursor = self.codeEdit.textCursor()
 
-        insert_code_into_editor(text_cursor, text_selector)
-        self._browser.ready()
+            insert_code_into_editor(text_cursor, text_selector)
+            self._browser.ready()
+        except Exception as e:
+            self._browser.error(e)
 
     def browser_not_available(self):
         QMessageBox.critical(self,
@@ -271,6 +278,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         selector = eval(code)
         highlight(selector)
+
+    def on_error(self, ev):
+        error_message = QMessageBox()
+        error_message.setWindowTitle(self.tr("Error"))
+        error_message.setText(self.tr("Germanium Selector Builder has encountered an error: ") + str(ev.data))
+        error_message.setDetailedText(traceback.format_exc(ev.data))
+        error_message.setIcon(QMessageBox.Critical)
+        error_message.setStandardButtons(QMessageBox.Close | QMessageBox.Ignore)
+        error_message.setEscapeButton(QMessageBox.Ignore)
+        error_message.setDefaultButton(QMessageBox.Ignore)
+
+        if error_message.exec_() == QMessageBox.Close:
+            self._browser.close_browser()
+            return
+
+        self._browser.error_processed()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
