@@ -26,9 +26,9 @@ def construct_germanium_selector(element):
         if is_unique(selector):
             return selector
 
-        #reference_text = get_reference_text(selector)
-        #if reference_text:
-        #    return reference_text
+    #reference_text = get_reference_text(selector)
+    #if reference_text:
+    #    return reference_text
 
     return None
 

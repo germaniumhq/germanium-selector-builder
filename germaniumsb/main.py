@@ -8,7 +8,8 @@ import traceback
 from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
 from germaniumsb.build_selector import build_selector
 from germaniumsb.code_editor import extract_code, insert_code_into_editor
-from germaniumsb.inject_code import inject_into_current_document, is_germaniumsb_injected
+from germaniumsb.inject_code import inject_into_current_document, is_germaniumsb_injected, \
+    start_picking_into_current_document, stop_picking_into_current_document
 
 from germaniumsb.pick_element import get_picked_element
 
@@ -56,12 +57,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._setup_buttons_visibilities()
         self._show_application_status()
 
+        #=====================================================
+        # logic states.
+        #=====================================================
+
         # actual actions mapped on the transitions
         self._browser.before_enter(BrowserState.STOPPED, _(self.stop_browser))
         self._browser.before_leave(BrowserState.STOPPED, _(self.start_browser))
         self._browser.after_enter(BrowserState.STARTED, _(self._browser.inject_code))
         self._browser.after_enter(BrowserState.INJECTING_CODE, _(self.inject_code))
-        self._browser.after_enter(BrowserState.PICKING, _(self.pick_element))
+        self._browser.after_enter(BrowserState.PICKING, _(self.start_picking_element))
+        self._browser.before_leave(BrowserState.PICKING, _(self.stop_picking_element))
         self._browser.after_enter(BrowserState.BROWSER_NOT_STARTED, _(self.browser_not_available))
         self._browser.after_enter(BrowserState.BROWSER_NOT_READY, _(self.browser_not_available))
         self._browser.after_enter(BrowserState.INJECTING_CODE_FAILED, self.injecting_code_failed)
@@ -70,7 +76,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.statusbar.addWidget(QLabel("Status:"))
         self.statusbar.addWidget(self.status_label)
-
 
         def timer_leave_state(ev):
             if ev.target_state != BrowserState.READY and \
@@ -187,6 +192,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self._browser.ready()
 
+    def start_picking_element(self):
+        error_happened, error_messages = start_picking_into_current_document()
+
+        if error_happened:
+            self._browser.error_injecting_code(error_messages)
+            return
+
+        self._browser.ready()
+
+    def stop_picking_element(self):
+        error_happened, error_messages = stop_picking_into_current_document()
+
+        if error_happened:
+            self._browser.error_injecting_code(error_messages)
+            return
+
+        self._browser.ready()
+
     def injecting_code_failed(self, ev):
         """
         This code will be called when the injection will fail
@@ -230,9 +253,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         insert_code_into_editor(text_cursor, text_selector)
         self._browser.ready()
-
-    def pick_element(self):
-        pass
 
     def browser_not_available(self):
         QMessageBox.critical(self,

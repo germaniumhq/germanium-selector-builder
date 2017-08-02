@@ -51,6 +51,7 @@ transitions:
     toggle_pause: PAUSED
   PAUSED:
     toggle_pause: READY
+    close_browser: STOPPED
   GENERATING_SELECTOR:
     ready: READY
     error: ERROR
