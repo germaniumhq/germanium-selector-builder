@@ -12,9 +12,16 @@ function germaniumStopPickingElement() {
 }
 window.germaniumStopPickingElement = germaniumStopPickingElement;
 
+var cursorX;
+var cursorY;
+document.addEventListener("mousemove", function (ev) {
+    cursorX = ev.pageX;
+    cursorY = ev.pageY;
+}, true);
+
 document.addEventListener("keyup", function(ev) {
     if (ev.ctrlKey && ev.keyCode == 16 || ev.shiftKey && ev.keyCode == 17) {
-        alert('let the capture begin');
+        window.__germanium_element = document.elementFromPoint(cursorX, cursorY);
     }
 }, true);
 

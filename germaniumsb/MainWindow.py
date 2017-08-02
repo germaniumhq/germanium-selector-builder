@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'germaniumsb/MainWindow.ui'
 #
-# Created: Wed Aug  2 21:54:49 2017
+# Created: Wed Aug  2 22:01:22 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
