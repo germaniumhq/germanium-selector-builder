@@ -18,7 +18,7 @@ def get_picked_element():
         print(e)
 
     for iframe_element in Element('iframe').element_list():
-        get_germanium().switch_to.iframe(iframe_element)
+        get_germanium().switch_to.frame(iframe_element)
         element = get_picked_element()
         if element:
             return element

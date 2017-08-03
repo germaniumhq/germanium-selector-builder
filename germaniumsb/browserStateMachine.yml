@@ -30,6 +30,7 @@ transitions:
   INJECTING_CODE:
     ready: READY
     error_injecting_code: INJECTING_CODE_FAILED
+    error: ERROR
     close_browser: STOPPED
     pick: BROWSER_NOT_READY
   INJECTING_CODE_FAILED:

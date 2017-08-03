@@ -188,13 +188,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         close_browser()
 
     def inject_code(self):
-        error_happened, error_messages = inject_into_current_document()
+        try:
+            error_happened, error_messages = inject_into_current_document()
 
-        if error_happened:
-            self._browser.error_injecting_code(error_messages)
+            if error_happened:
+                self._browser.error_injecting_code(error_messages)
+                return
+
+            self._browser.ready()
+        except Exception as e:
+            self._browser.error(e)
             return
-
-        self._browser.ready()
 
     def start_picking_element(self):
         error_happened, error_messages = start_picking_into_current_document()
@@ -239,16 +243,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.error_processed()
 
     def on_pick_timer(self):
-        if not is_germaniumsb_injected():
-            self._browser.inject_code()
-            return
+        try:
+            if not is_germaniumsb_injected():
+                self._browser.inject_code()
+                return
 
-        element = get_picked_element()
+            element = get_picked_element()
 
-        if not element:
-            return
+            if not element:
+                return
 
-        self._browser.generate_selector(element)
+            self._browser.generate_selector(element)
+        except Exception as e:
+            self._browser.error(e)
 
     def generate_selector(self, ev):
         try:

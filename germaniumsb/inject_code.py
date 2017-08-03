@@ -25,8 +25,11 @@ def inject_into_current_document(error_messages=None):
         error_happened = True
 
     for iframe_element in Element('iframe').element_list():
-        get_germanium().switch_to.iframe(iframe_element)
-        error_happened |= inject_into_current_document(error_messages)
+        get_germanium().switch_to.frame(iframe_element)
+        iframe_error_happened, iframe_error_messages = \
+            inject_into_current_document(error_messages)
+
+        error_happened |= iframe_error_happened
 
     return error_happened, error_messages
 
@@ -44,7 +47,7 @@ def start_picking_into_current_document(error_messages=None):
         error_happened = True
 
     for iframe_element in Element('iframe').element_list():
-        get_germanium().switch_to.iframe(iframe_element)
+        get_germanium().switch_to.frame(iframe_element)
         error_happened |= start_picking_into_current_document(error_messages)
 
     return error_happened, error_messages
@@ -63,7 +66,7 @@ def stop_picking_into_current_document(error_messages=None):
         error_happened = True
 
     for iframe_element in Element('iframe').element_list():
-        get_germanium().switch_to.iframe(iframe_element)
+        get_germanium().switch_to.frame(iframe_element)
         error_happened |= stop_picking_into_current_document(error_messages)
 
     return error_happened, error_messages
