@@ -15,7 +15,7 @@ stage('Build EXE File') {
                 'nexus:nexus'
             ],
             volumes: [
-                "${env.PWD}:/src:rw"
+                "${WORKSPACE}:/src:rw"
             ]
     }
 }
