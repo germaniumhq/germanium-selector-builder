@@ -5,11 +5,6 @@ stage('Build EXE File') {
 
         checkout scm
 
-        sh """
-            env
-            exit 1
-        """
-
         dockerRun image: 'cdrx/pyinstaller-windows:python2',
             remove: true,
             env: [
@@ -20,7 +15,7 @@ stage('Build EXE File') {
                 'nexus:nexus'
             ],
             volumes: [
-                "/opt/host:/src:rw"
+                "${env.PWD}:/src:rw"
             ]
     }
 }
