@@ -5,8 +5,6 @@ FROM ubuntu:14.04
 ENV DEBIAN_FRONTEND noninteractive
 
 ARG WINE_VERSION=winehq-devel
-ARG PYTHON_VERSION=2.7.12
-ARG PYINSTALLER_VERSION=3.2.0
 
 # we need wine for this all to work, so we'll use the PPA
 RUN set -x \
@@ -29,10 +27,11 @@ ENV PYPI_URL=https://pypi.python.org/
 ENV PYPI_INDEX_URL=https://pypi.python.org/simple
 
 # install python inside wine
+ARG PYTHON_VERSION=2.7.13
 RUN set -x \
     && wget -nv https://www.python.org/ftp/python/$PYTHON_VERSION/python-$PYTHON_VERSION.msi \
     && wine msiexec /qn /a python-$PYTHON_VERSION.msi \
-    && rm python-2.7.12.msi \
+    && rm python-$PYTHON_VERSION.msi \
     && sed -i 's/_windows_cert_stores = .*/_windows_cert_stores = ("ROOT",)/' "/wine/drive_c/Python27/Lib/ssl.py" \
     && echo 'wine '\''C:\Python27\python.exe'\'' "$@"' > /usr/bin/python \
     && echo 'wine '\''C:\Python27\Scripts\easy_install.exe'\'' "$@"' > /usr/bin/easy_install \
@@ -47,6 +46,7 @@ RUN set -x \
     && rm -rf /tmp/.wine-*
 
 # install pyinstaller
+ARG PYINSTALLER_VERSION=3.1.1
 RUN /usr/bin/pip install pyinstaller==$PYINSTALLER_VERSION
 
 # put the src folder inside wine

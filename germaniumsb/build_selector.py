@@ -13,18 +13,25 @@ def construct_germanium_selector(element):
     if is_input_text(element):
         selector = InputText()
         attributes = get_attributes(element)
-        if 'name' in attributes:
+
+        if 'name' in attributes and attributes['name']:
             if not selector.exact_attributes:
                 selector.exact_attributes = {}
             selector.exact_attributes['name'] = attributes['name']
 
-        if 'placeholder' in attributes:
+        if 'placeholder' in attributes and attributes['placeholder']:
             if not selector.exact_attributes:
                 selector.exact_attributes = {}
             selector.exact_attributes['placeholder'] = attributes['placeholder']
 
         if is_unique(selector):
             return selector
+
+    if is_link(element):
+        pass
+
+    if is_image(element):
+        pass
 
     #reference_text = get_reference_text(selector)
     #if reference_text:
