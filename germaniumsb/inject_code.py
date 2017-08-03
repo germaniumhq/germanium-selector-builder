@@ -2,7 +2,7 @@ from germanium.static import *
 import pkg_resources
 
 
-def inject_into_current_document(error_messages=None):
+def inject_into_current_document(error_messages=None, checked_frames=None):
     """
     Inject JS code into the document that allows picking
     the current element.
@@ -10,7 +10,8 @@ def inject_into_current_document(error_messages=None):
     :return:
     """
     error_happened = False
-    error_messages = error_messages if error_messages else []
+    error_messages = error_messages if error_messages is not None else []
+    checked_frames = checked_frames if checked_frames is not None else set()
 
     script = pkg_resources.resource_string(__name__, "../js/find_element_script.js")
     if type(script) != 'str':  # it is bytes
@@ -25,18 +26,24 @@ def inject_into_current_document(error_messages=None):
         error_happened = True
 
     for iframe_element in Element('iframe').element_list():
+        if iframe_element in checked_frames:
+            continue
+
+        checked_frames.add(iframe_element)
+
         get_germanium().switch_to.frame(iframe_element)
         iframe_error_happened, iframe_error_messages = \
-            inject_into_current_document(error_messages)
+            inject_into_current_document(error_messages, checked_frames)
 
         error_happened |= iframe_error_happened
 
     return error_happened, error_messages
 
 
-def start_picking_into_current_document(error_messages=None):
+def start_picking_into_current_document(error_messages=None, checked_frames=None):
     error_happened = False
-    error_messages = error_messages if error_messages else []
+    error_messages = error_messages if error_messages is not None else []
+    checked_frames = checked_frames if checked_frames is not None else set()
 
     try:
         if not js('return window["__germanium_picking_mode_enabled"];'):
@@ -47,15 +54,21 @@ def start_picking_into_current_document(error_messages=None):
         error_happened = True
 
     for iframe_element in Element('iframe').element_list():
+        if iframe_element in checked_frames:
+            continue
+
+        checked_frames.add(iframe_element)
+
         get_germanium().switch_to.frame(iframe_element)
-        error_happened |= start_picking_into_current_document(error_messages)
+        error_happened |= start_picking_into_current_document(error_messages, checked_frames)
 
     return error_happened, error_messages
 
 
-def stop_picking_into_current_document(error_messages=None):
+def stop_picking_into_current_document(error_messages=None, checked_frames=None):
     error_happened = False
-    error_messages = error_messages if error_messages else []
+    error_messages = error_messages if error_messages is not None else []
+    checked_frames = checked_frames if checked_frames is not None else set()
 
     try:
         if js('return window["__germanium_picking_mode_enabled"];'):
@@ -66,8 +79,13 @@ def stop_picking_into_current_document(error_messages=None):
         error_happened = True
 
     for iframe_element in Element('iframe').element_list():
+        if iframe_element in checked_frames:
+            continue
+
+        checked_frames.add(iframe_element)
+
         get_germanium().switch_to.frame(iframe_element)
-        error_happened |= stop_picking_into_current_document(error_messages)
+        error_happened |= stop_picking_into_current_document(error_messages, checked_frames)
 
     return error_happened, error_messages
 
