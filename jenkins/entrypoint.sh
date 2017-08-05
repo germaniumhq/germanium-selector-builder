@@ -31,6 +31,7 @@ echo "$@"
 
 if [[ "$@" == "" ]]; then
     pwd
+    ls -la
     ls *.spec
     pyinstaller --clean -y --workpath /tmp --distpath ./dist/windows main.spec
     chown -R --reference=. ./dist/windows
