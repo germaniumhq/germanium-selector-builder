@@ -2,9 +2,11 @@
 
 block_cipher = None
 
+import germaniumdrivers
 
-datas = collect_data_files('germaniumdrivers')
-print(datas)
+datas = []
+datas += (germaniumdrivers.ensure_driver('chrome'), r'germaniumdrivers\binary\chrome\win\32\chromedriver.exe')
+datas += (germaniumdrivers.ensure_driver('ie'), r'germaniumdrivers\binary\ie\win\32\IEDriverServer.exe')
 
 a = Analysis(['germaniumsb/main.py'],
              pathex=['./germaniumsb'],
