@@ -5,11 +5,6 @@ stage('Build Docker EXE Creator') {
 
         checkout scm
 
-        sh """
-            pwd
-            ls -la
-        """
-
         dockerBuild file: './jenkins/Dockerfile',
             tags: ['bmst/pyinstaller-windows-py27']
     }
@@ -17,11 +12,6 @@ stage('Build Docker EXE Creator') {
 
 stage('Build EXE File') {
     node {
-        sh """
-            pwd
-            ls -la
-        """
-
         dockerRun image: 'bmst/pyinstaller-windows-py27',
             remove: true,
             env: [
@@ -32,8 +22,12 @@ stage('Build EXE File') {
                 'nexus:nexus'
             ],
             volumes: [
+                // Sad panda, I need to specify the absolute path on the docker host
+                // while running in a container.
                 "/opt/jenkins_home/jobs/germanium-selector-builder/workspace:/src:rw"
             ]
+
+        archiveArtifacts artifacts: './dist/windows/main.exe', fingerprint: true
     }
 }
 
