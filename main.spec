@@ -16,14 +16,20 @@ a = Analysis(['germaniumsb/main.py'],
              cipher=block_cipher)
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
+for f in a.binaries:
+    print("BINARY: %s" % (f,))
+
 exe = EXE(pyz,
           a.scripts,
-          exclude_binaries=True,
+          a.binaries,
+          a.zipfiles,
+          a.datas,
           name='main',
           debug=False,
           strip=False,
           upx=True,
           console=True )
+
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
