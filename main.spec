@@ -4,6 +4,7 @@ block_cipher = None
 
 
 datas = collect_data_files('germaniumdrivers')
+print(datas)
 
 a = Analysis(['germaniumsb/main.py'],
              pathex=['./germaniumsb'],
