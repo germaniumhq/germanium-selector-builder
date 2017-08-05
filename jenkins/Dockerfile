@@ -46,7 +46,7 @@ RUN set -x \
     && rm -rf /tmp/.wine-*
 
 # install pyinstaller
-ARG PYINSTALLER_VERSION=3.1.1
+ARG PYINSTALLER_VERSION=3.2.1
 RUN /usr/bin/pip install pyinstaller==$PYINSTALLER_VERSION
 
 # put the src folder inside wine

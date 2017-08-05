@@ -10,9 +10,10 @@ def construct_germanium_selector(element):
     if is_inside_table(element):
         pass
 
+    attributes = get_attributes(element)
+
     if is_input_text(element):
         selector = InputText()
-        attributes = get_attributes(element)
 
         if 'name' in attributes and attributes['name']:
             if not selector.exact_attributes:
@@ -27,17 +28,18 @@ def construct_germanium_selector(element):
         if is_unique(selector):
             return selector
 
-    if is_link(element):
-        pass
-
-    if is_image(element):
-        pass
-
     #reference_text = get_reference_text(selector)
     #if reference_text:
     #    return reference_text
 
-    return None
+    result = Element(tag_name=element.tag_name,
+                     exact_attributes=attributes)
+
+    text = get_text(element)
+    if text:
+        result.exact_text = text
+
+    return result
 
 
 # def get_reference_text(original):
@@ -72,10 +74,13 @@ def is_inside_table(element):
 
 
 def selector_to_string(selector):
-    # if not selector:
-    #     return "# unable to build selector"
+    if not selector:
+        return "# unable to build selector"
 
     result = 'Element("%s"' % selector.tag_name
+
+    if selector.exact_text is not None:
+        result += ', exact_text="%s"' % selector.exact_text
 
     if selector.exact_attributes:
         result += ', exact_attributes=%s' % selector.exact_attributes
