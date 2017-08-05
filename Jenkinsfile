@@ -5,6 +5,11 @@ stage('Build Docker EXE Creator') {
 
         checkout scm
 
+        sh """
+            pwd
+            ls -la
+        """
+
         dockerBuild file: './jenkins/Dockerfile',
             tags: ['bmst/pyinstaller-windows-py27']
     }
@@ -12,6 +17,11 @@ stage('Build Docker EXE Creator') {
 
 stage('Build EXE File') {
     node {
+        sh """
+            pwd
+            ls -la
+        """
+
         dockerRun image: 'bmst/pyinstaller-windows-py27',
             remove: true,
             env: [
