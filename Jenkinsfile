@@ -27,7 +27,7 @@ stage('Build EXE File') {
                 "/opt/jenkins_home/jobs/germanium-selector-builder/workspace:/src:rw"
             ]
 
-        archiveArtifacts artifacts: './dist/windows/main.exe', fingerprint: true
+        archiveArtifacts artifacts: 'dist/windows/main.exe', fingerprint: true
     }
 }
 
