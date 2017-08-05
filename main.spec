@@ -5,8 +5,8 @@ block_cipher = None
 import germaniumdrivers
 
 datas = [
-    (germaniumdrivers.ensure_driver('chrome'), r'germaniumdrivers\binary\chrome\win\32\chromedriver.exe', 'DATA'),
-    (germaniumdrivers.ensure_driver('ie'), r'germaniumdrivers\binary\ie\win\32\IEDriverServer.exe', 'DATA')
+    (germaniumdrivers.ensure_driver('chrome'), r'germaniumdrivers\binary\chrome\win\32\chromedriver.exe'),
+    (germaniumdrivers.ensure_driver('ie'), r'germaniumdrivers\binary\ie\win\32\IEDriverServer.exe')
 ]
 
 a = Analysis(['germaniumsb/main.py'],
