@@ -3,10 +3,12 @@
 block_cipher = None
 
 
+datas = collect_data_files('germaniumdrivers')
+
 a = Analysis(['germaniumsb/main.py'],
              pathex=['./germaniumsb'],
              binaries=[],
-             datas=[],
+             datas=datas,
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -18,9 +20,6 @@ a = Analysis(['germaniumsb/main.py'],
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 
-for f in a.binaries:
-    print("BINARY: %s" % (f,))
-
 exe = EXE(pyz,
           a.scripts,
           a.binaries,
@@ -30,7 +29,7 @@ exe = EXE(pyz,
           debug=False,
           strip=False,
           upx=True,
-          console=True )
+          console=True, )
 
 #coll = COLLECT(exe,
 #               a.binaries,
