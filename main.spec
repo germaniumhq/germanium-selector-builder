@@ -5,6 +5,7 @@ block_cipher = None
 import germaniumdrivers
 
 datas = [
+    ('js/find_element_script.js', 'js'),
     (germaniumdrivers.ensure_driver('chrome'), r'germaniumdrivers\binary\chrome\win\32'),
     (germaniumdrivers.ensure_driver('ie'), r'germaniumdrivers\binary\ie\win\32')
 ]
