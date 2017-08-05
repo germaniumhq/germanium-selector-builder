@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['germaniumsb/main.py'],
-             pathex=[r'C:\src'],
+             pathex=['./germaniumsb'],
              binaries=[],
              datas=[],
              hiddenimports=[],
