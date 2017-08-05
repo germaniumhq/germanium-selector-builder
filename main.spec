@@ -32,10 +32,11 @@ exe = EXE(pyz,
           upx=True,
           console=True )
 
-coll = COLLECT(exe,
-               a.binaries,
-               a.zipfiles,
-               a.datas,
-               strip=False,
-               upx=True,
-               name='main')
+#coll = COLLECT(exe,
+#               a.binaries,
+#               a.zipfiles,
+#               a.datas,
+#               strip=False,
+#               upx=True,
+#               name='main')
+
