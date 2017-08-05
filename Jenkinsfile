@@ -32,7 +32,7 @@ stage('Build EXE File') {
                 'nexus:nexus'
             ],
             volumes: [
-                "${WORKSPACE}:/src:rw"
+                "/opt/jenkins_home/jobs/germanium-selector-builder/workspace:/src:rw"
             ]
     }
 }
