@@ -24,7 +24,7 @@ datas = [
     (germaniumdrivers.ensure_driver('ie'), r'germaniumdrivers\binary\ie\win\32')
 ]
 
-datas.append(('germaniumsb/favicon.ico', 'germaniumsb/favicon.ico'))
+datas.append(('favicon.ico', 'favicon.ico'))
 
 add_files(germanium, "germanium")
 
@@ -58,6 +58,6 @@ exe = EXE(pyz,
           strip=False,
           upx=True,
           console=True,
-          icon='germaniumsb/favicon.ico',
+          icon='favicon.ico',
 )
 
