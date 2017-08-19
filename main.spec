@@ -58,6 +58,6 @@ exe = EXE(pyz,
           strip=False,
           upx=True,
           console=True,
-          icon='favicon.ico',
+          icon='germaniumsb/favicon.ico',
 )
 
