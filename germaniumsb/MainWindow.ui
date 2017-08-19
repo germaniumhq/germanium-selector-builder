@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../data/favicon.ico</normaloff>../data/favicon.ico</iconset>
+    <normaloff>../favicon.ico</normaloff>../favicon.ico</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
