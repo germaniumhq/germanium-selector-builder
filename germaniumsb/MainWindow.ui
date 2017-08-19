@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Germanium Selector Builder v2.0.5</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../data/favicon.ico</normaloff>../data/favicon.ico</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
