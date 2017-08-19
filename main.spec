@@ -24,7 +24,7 @@ datas = [
     (germaniumdrivers.ensure_driver('ie'), r'germaniumdrivers\binary\ie\win\32')
 ]
 
-datas.append('data/favicon.ico', 'data/favicon.ico')
+datas.append(('data/favicon.ico', 'data/favicon.ico'))
 
 add_files(germanium, "germanium")
 
