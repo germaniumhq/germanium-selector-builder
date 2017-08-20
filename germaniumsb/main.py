@@ -1,9 +1,11 @@
 import sys
+from PySide import QtGui
 from PySide.QtGui import *
 from PySide.QtCore import *
 from MainWindow import Ui_MainWindow
 from germanium.static import *
 import traceback
+import os
 
 from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
 from germaniumsb.build_selector import build_selector
@@ -15,6 +17,13 @@ from germaniumsb.pick_element import get_picked_element
 
 BROWSERS=["Chrome", "Firefox", "IE"]
 
+
+def base_dir(sub_path=""):
+    # pth is set by pyinstaller with the folder where the application
+    # will be unpacked.
+    if 'pth' in globals():
+        return os.path.join(pth, sub_path)
+    return os.path.abspath(os.path.dirname(__file__))
 
 def _(callable):
     """
@@ -43,6 +52,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.application_initialized()
 
     def assign_widgets(self):
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(os.path.join(base_dir("germaniumsb"), "favicon.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(icon)
+
         for browser in BROWSERS:
             self.browserCombo.addItem(browser)
 
