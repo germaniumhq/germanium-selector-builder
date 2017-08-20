@@ -53,7 +53,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def assign_widgets(self):
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(os.path.join(base_dir("germaniumsb"), "favicon.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon_path = os.path.join(base_dir("germaniumsb"), "favicon.ico")
+        print("Loading the icon from %s" % icon_path)
+        icon.addPixmap(QtGui.QPixmap(icon_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(icon)
 
         for browser in BROWSERS:
