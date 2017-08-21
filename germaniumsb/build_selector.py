@@ -20,10 +20,19 @@ def construct_germanium_selector(element):
                 selector.exact_attributes = {}
             selector.exact_attributes['name'] = attributes['name']
 
+            if is_unique(selector):
+                return selector
+
         if 'placeholder' in attributes and attributes['placeholder']:
             if not selector.exact_attributes:
                 selector.exact_attributes = {}
             selector.exact_attributes['placeholder'] = attributes['placeholder']
+
+            if is_unique(selector):
+                return selector
+
+        if 'class' in attributes and attributes['class']:
+            selector.css_classes = attributes['class'].split()
 
         if is_unique(selector):
             return selector
@@ -34,6 +43,9 @@ def construct_germanium_selector(element):
 
     result = Element(tag_name=element.tag_name,
                      exact_attributes=attributes)
+
+    if 'class' in attributes and attributes['class']:
+        result.css_classes = attributes['class'].split()
 
     text = get_text(element)
     if text:
@@ -84,6 +96,9 @@ def selector_to_string(selector):
 
     if selector.exact_attributes:
         result += ', exact_attributes=%s' % selector.exact_attributes
+
+    if selector.css_classes:
+        result += ', css_classes=%s' % selector.css_classes
 
     result += ')'
 

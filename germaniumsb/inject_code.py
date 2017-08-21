@@ -31,7 +31,13 @@ def inject_into_current_document(error_messages=None, checked_frames=None):
 
         checked_frames.add(iframe_element)
 
-        get_germanium().switch_to.frame(iframe_element)
+        try:
+            get_germanium().switch_to.frame(iframe_element)
+        except Exception:
+            # it's ok to have switching failing if the iframes are being
+            # switcharoeed
+            continue
+
         iframe_error_happened, iframe_error_messages = \
             inject_into_current_document(error_messages, checked_frames)
 

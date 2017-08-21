@@ -1,14 +1,50 @@
 (function() {
 
+document.addEventListener("mousedown", mouseDownEventHandler, true);
+document.addEventListener("mouseup", mouseUpEventHandler, true);
+document.addEventListener("click", mouseClickEventHandler, true);
+
+germaniumStopPickingElement();
+
+var mouseDown = false;
+
+function halt(ev) {
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+    ev.stopPropagation();
+}
+
+function mouseDownEventHandler(ev) {
+    if (window['__germanium_picking_mode_enabled']) {
+        window.__germanium_element = ev.target;
+        halt(ev);
+        mouseDown = true;
+    }
+}
+
+function mouseUpEventHandler(ev) {
+    if (window['__germanium_picking_mode_enabled'] || mouseDown) {
+        halt(ev);
+        mouseDown = false;
+    }
+}
+
+function mouseClickEventHandler(ev) {
+    if (window['__germanium_picking_mode_enabled'] || mouseDown) {
+        halt(ev);
+        mouseDown = false;
+    }
+}
+
 function germaniumPickElement() {
-    window.__germanium_picking_mode_enabled = true;
-    document.addEventListener("mousedown", mouseDownListener, true);
+    console.log('picking element');
+    window['__germanium_picking_mode_enabled'] = true;
 }
 window.germaniumPickElement = germaniumPickElement;
 
 function germaniumStopPickingElement() {
-    window.__germanium_picking_mode_enabled = false;
-    document.removeEventListener("mousedown", mouseDownListener, true);
+    console.log('STOPPED picking element');
+    window['__germanium_picking_mode_enabled'] = false;
 }
 window.germaniumStopPickingElement = germaniumStopPickingElement;
 
@@ -24,15 +60,6 @@ document.addEventListener("keyup", function(ev) {
         window.__germanium_element = document.elementFromPoint(cursorX, cursorY);
     }
 }, true);
-
-function mouseDownListener(ev) {
-    window.__germanium_element = ev.target;
-
-    ev.preventDefault();
-    ev.stopImmediatePropagation();
-    ev.stopPropagation();
-}
-
 
 window.__germanium_loaded = true;
 
