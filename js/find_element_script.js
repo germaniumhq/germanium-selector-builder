@@ -7,6 +7,7 @@ document.addEventListener("click", mouseClickEventHandler, true);
 germaniumStopPickingElement();
 
 var mouseDown = false;
+var mouseDownCancelled = false;
 
 function halt(ev) {
     ev.preventDefault();
@@ -19,6 +20,7 @@ function mouseDownEventHandler(ev) {
         window.__germanium_element = ev.target;
         halt(ev);
         mouseDown = true;
+        mouseDownCancelled = true;
     }
 }
 
@@ -30,9 +32,9 @@ function mouseUpEventHandler(ev) {
 }
 
 function mouseClickEventHandler(ev) {
-    if (window['__germanium_picking_mode_enabled'] || mouseDown) {
+    if (window['__germanium_picking_mode_enabled'] || mouseDownCancelled) {
         halt(ev);
-        mouseDown = false;
+        mouseDownCancelled = false;
     }
 }
 

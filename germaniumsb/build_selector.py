@@ -6,6 +6,27 @@ def build_selector(element):
     return selector_to_string(selector)
 
 
+def single_attribute_exact_match(selector, attributes, attribute_name):
+    """
+    Checks if there is an attribute defined that matches exactly
+    a single element. This will mutate the selector.
+    :param selector:
+    :param attributes:
+    :param attribute_name:
+    :return:
+    """
+    if attribute_name in attributes and attributes[attribute_name]:
+        if not selector.exact_attributes:
+            selector.exact_attributes = {}
+        selector.exact_attributes[attribute_name] = attributes[attribute_name]
+
+        if is_unique(selector):
+            return True
+
+    return False
+
+
+
 def construct_germanium_selector(element):
     if is_inside_table(element):
         pass
@@ -15,21 +36,11 @@ def construct_germanium_selector(element):
     if is_input_text(element):
         selector = InputText()
 
-        if 'name' in attributes and attributes['name']:
-            if not selector.exact_attributes:
-                selector.exact_attributes = {}
-            selector.exact_attributes['name'] = attributes['name']
+        if single_attribute_exact_match(selector, attributes, 'name'):
+            return selector
 
-            if is_unique(selector):
-                return selector
-
-        if 'placeholder' in attributes and attributes['placeholder']:
-            if not selector.exact_attributes:
-                selector.exact_attributes = {}
-            selector.exact_attributes['placeholder'] = attributes['placeholder']
-
-            if is_unique(selector):
-                return selector
+        if single_attribute_exact_match(selector, attributes, 'placeholder'):
+            return selector
 
         if 'class' in attributes and attributes['class']:
             selector.css_classes = attributes['class'].split()
@@ -41,17 +52,31 @@ def construct_germanium_selector(element):
     #if reference_text:
     #    return reference_text
 
-    result = Element(tag_name=element.tag_name,
-                     exact_attributes=attributes)
-
-    if 'class' in attributes and attributes['class']:
-        result.css_classes = attributes['class'].split()
+    selector = Element(tag_name=element.tag_name)
 
     text = get_text(element)
     if text:
-        result.exact_text = text
+        selector.exact_text = text
 
-    return result
+        if is_unique(selector):
+            return selector
+
+    if single_attribute_exact_match(selector, attributes, 'title'):
+        return selector
+
+    if single_attribute_exact_match(selector, attributes, 'alt'):
+        return selector
+
+    if single_attribute_exact_match(selector, attributes, 'aria-label'):
+        return selector
+
+    if 'class' in attributes and attributes['class']:
+        selector.css_classes = attributes['class'].split()
+
+        if is_unique(selector):
+            return selector
+
+    return selector
 
 
 # def get_reference_text(original):

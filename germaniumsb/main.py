@@ -204,7 +204,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def inject_code(self):
         try:
-            error_happened, error_messages = inject_into_current_document()
+            _, error_happened, error_messages = inject_into_current_document()
 
             if error_happened:
                 self._browser.error_injecting_code(error_messages)
@@ -216,7 +216,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
 
     def start_picking_element(self):
-        error_happened, error_messages = start_picking_into_current_document()
+        _, error_happened, error_messages = start_picking_into_current_document()
 
         if error_happened:
             self._browser.error_injecting_code(error_messages)
@@ -225,7 +225,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.ready()
 
     def stop_picking_element(self):
-        error_happened, error_messages = stop_picking_into_current_document()
+        _, error_happened, error_messages = stop_picking_into_current_document()
 
         if error_happened:
             self._browser.error_injecting_code(error_messages)
@@ -263,7 +263,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self._browser.inject_code()
                 return
 
-            element = get_picked_element()
+            element, error_happened, error_messages = get_picked_element()
 
             if not element:
                 return
