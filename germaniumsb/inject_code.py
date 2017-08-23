@@ -41,6 +41,11 @@ def is_germaniumsb_injected():
 
 
 def run_in_all_iframes(code, error_messages=None, checked_frames=None):
+    get_germanium().switch_to.default_content()
+    return _run_in_all_iframes_internal(code, error_messages, checked_frames)
+
+
+def _run_in_all_iframes_internal(code, error_messages=None, checked_frames=None):
     error_happened = False
     error_messages = error_messages if error_messages is not None else []
     checked_frames = checked_frames if checked_frames is not None else set()
@@ -49,6 +54,9 @@ def run_in_all_iframes(code, error_messages=None, checked_frames=None):
 
     try:
         result = code()
+
+        if result:
+            return result, error_happened, error_messages
     except Exception as e:
         print(e)
         error_messages.append(str(e))
@@ -68,11 +76,11 @@ def run_in_all_iframes(code, error_messages=None, checked_frames=None):
             continue
 
         iframe_result, iframe_error_happened, iframe_error_messages = \
-            run_in_all_iframes(code, error_messages, checked_frames)
+            _run_in_all_iframes_internal(code, error_messages, checked_frames)
 
         error_happened |= iframe_error_happened
 
         if iframe_result and not result:
-            result = iframe_result
+            return iframe_result, error_happened, error_messages
 
     return result, error_happened, error_messages

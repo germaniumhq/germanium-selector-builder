@@ -85,4 +85,6 @@ document.addEventListener("keyup", function(ev) {
 
 window.__germanium_loaded = true;
 
+console.log('germanium injected');
+
 })();
