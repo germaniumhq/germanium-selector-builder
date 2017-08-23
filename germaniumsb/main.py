@@ -200,7 +200,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Code called when we're supposed to tear down the browser.
         :return:
         """
-        close_browser()
+        if get_germanium():
+            close_browser()
 
     def inject_code(self):
         try:
@@ -221,8 +222,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if error_happened:
             self._browser.error_injecting_code(error_messages)
             return
-
-        self._browser.ready()
 
     def stop_picking_element(self):
         _, error_happened, error_messages = stop_picking_into_current_document()

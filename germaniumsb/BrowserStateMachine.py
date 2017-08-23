@@ -283,6 +283,12 @@ class BrowserStateMachine(object):
         if not source_state:
             return None
 
+        if link_name not in source_state:
+            print("There is no transition named `%s` starting from `%s`." %
+                  (link_name, self._currentState.value))
+
+            return None
+
         targetState = source_state[link_name]
 
         if not targetState:

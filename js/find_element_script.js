@@ -8,6 +8,7 @@ germaniumStopPickingElement();
 
 var mouseDown = false;
 var mouseDownCancelled = false;
+var captureTimerRunning = false;
 
 function halt(ev) {
     ev.preventDefault();
@@ -16,25 +17,44 @@ function halt(ev) {
 }
 
 function mouseDownEventHandler(ev) {
+    if (captureTimerRunning) {
+        return halt(ev);
+    }
+
     if (window['__germanium_picking_mode_enabled']) {
+        console.log('cancel mousedown event');
         window.__germanium_element = ev.target;
         halt(ev);
         mouseDown = true;
         mouseDownCancelled = true;
+        captureTimerRunning = true;
+
+        setTimeout(function() {
+            captureTimerRunning = false;
+        }, 1000);
+
+        return false;
     }
+
 }
 
 function mouseUpEventHandler(ev) {
-    if (window['__germanium_picking_mode_enabled'] || mouseDown) {
+    if (window['__germanium_picking_mode_enabled'] || mouseDown || captureTimerRunning) {
+        console.log('cancel mouseup event');
         halt(ev);
         mouseDown = false;
+
+        return false;
     }
 }
 
 function mouseClickEventHandler(ev) {
-    if (window['__germanium_picking_mode_enabled'] || mouseDownCancelled) {
+    if (window['__germanium_picking_mode_enabled'] || mouseDownCancelled || captureTimerRunning) {
+        console.log('cancel click event');
         halt(ev);
         mouseDownCancelled = false;
+
+        return false;
     }
 }
 
