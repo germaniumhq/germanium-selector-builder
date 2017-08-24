@@ -69,6 +69,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         cancel_pick_shortcut = QShortcut(QKeySequence(self.tr("Escape", "Execute|Cancel Pick")),
                                          self)
 
+        self.statusbar.addWidget(QLabel("Status:"))
+        self.statusbar.addWidget(self.status_label)
+
         self._setup_buttons_visibilities()
         self._show_application_status()
 
@@ -82,7 +85,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.after_enter(BrowserState.STARTED, _(self._browser.inject_code))
         self._browser.after_enter(BrowserState.INJECTING_CODE, _(self.inject_code))
         self._browser.after_enter(BrowserState.PICKING, _(self.start_picking_element))
-        self._browser.before_leave(BrowserState.PICKING, _(self.stop_picking_element))
         self._browser.after_enter(BrowserState.BROWSER_NOT_STARTED, _(self.browser_not_available))
         self._browser.after_enter(BrowserState.BROWSER_NOT_READY, _(self.browser_not_available))
         self._browser.after_enter(BrowserState.INJECTING_CODE_FAILED, self.injecting_code_failed)
@@ -90,9 +92,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.after_enter(BrowserState.GENERATING_SELECTOR, self.generate_selector)
 
         self._browser.after_enter(BrowserState.ERROR, self.on_error)
-
-        self.statusbar.addWidget(QLabel("Status:"))
-        self.statusbar.addWidget(self.status_label)
 
         def timer_leave_state(ev):
             if ev.target_state != BrowserState.READY and \
@@ -102,6 +101,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.after_enter(BrowserState.READY, _(lambda: self.pick_timer.start(2000)))
         self._browser.before_leave(BrowserState.READY, timer_leave_state)
         self._browser.before_leave(BrowserState.PICKING, timer_leave_state)
+
+        self._browser.before_leave(BrowserState.PICKING, _(self.stop_picking_element))
+        self._browser.before_leave(BrowserState.GENERATING_SELECTOR, self.stop_picking_element)
 
         # self.codeEdit.setPlainText(build_selector(element))
 
@@ -223,14 +225,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self._browser.error_injecting_code(error_messages)
             return
 
-    def stop_picking_element(self):
+    def stop_picking_element(self, ev):
+        # in case we're generating the selector, we need to keep the
+        # iframe correct, so we're not switching until the selector
+        # is computed.
+        if ev.start_state == BrowserState.PICKING and \
+                        ev.start_state == BrowserState.GENERATING_SELECTOR:
+            return
+
         _, error_happened, error_messages = stop_picking_into_current_document()
 
         if error_happened:
-            self._browser.error_injecting_code(error_messages)
+            self._browser.error(error_messages)
             return
-
-        self._browser.ready()
 
     def injecting_code_failed(self, ev):
         """
