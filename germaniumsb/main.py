@@ -230,7 +230,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # iframe correct, so we're not switching until the selector
         # is computed.
         if ev.start_state == BrowserState.PICKING and \
-                        ev.start_state == BrowserState.GENERATING_SELECTOR:
+                        ev.target_state == BrowserState.GENERATING_SELECTOR:
             return
 
         _, error_happened, error_messages = stop_picking_into_current_document()
