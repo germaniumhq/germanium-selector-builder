@@ -70,6 +70,10 @@ def construct_germanium_selector(element):
     if single_attribute_exact_match(selector, attributes, 'aria-label'):
         return selector
 
+    if element.tag_name == 'img':
+        if single_attribute_exact_match(selector, attributes, 'src'):
+            return selector
+
     if 'class' in attributes and attributes['class']:
         selector.css_classes = attributes['class'].split()
 
@@ -114,10 +118,10 @@ def selector_to_string(selector):
     if not selector:
         return "# unable to build selector"
 
-    result = 'Element("%s"' % selector.tag_name
+    result = 'Element(' + double_quotes_text(selector.tag_name)
 
     if selector.exact_text is not None:
-        result += ', exact_text="%s"' % selector.exact_text
+        result += ', exact_text=' + double_quotes_text(selector.exact_text)
 
     if selector.exact_attributes:
         result += ', exact_attributes=%s' % selector.exact_attributes
@@ -128,6 +132,23 @@ def selector_to_string(selector):
     result += ')'
 
     return result
+
+# Escapes the double quotes. If the string is unicode, it will
+# prefix the entry with an 'u'
+# FIXME: should backslash escapes be used?
+def double_quotes_text(s):
+    if not is_pure_ascii(s):
+        return 'u"' + s.replace('"', '\\"', 100000) + '"'
+
+    return '"' + s.replace('"', '\\"', 100000) + '"'
+
+
+def is_pure_ascii(s):
+    try:
+        s.encode('ascii')
+        return True
+    except UnicodeEncodeError:
+        return False
 
 
 def is_unique(selector):
