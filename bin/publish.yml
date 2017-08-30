@@ -1,0 +1,22 @@
+- name: Publish the Lastest Germanium Selector Builder
+  hosts: ciplogic
+  become: true
+  tasks:
+    - name: Download the exe from nexus.
+      delegate_to: localhost
+      get_url:
+        url: http://192.168.0.2:8080/job/germanium-selector-builder/lastSuccessfulBuild/artifact/dist/windows/main.exe
+        dest: /tmp/main.exe
+
+    - name: Upload the exe file.
+      synchronize:
+        src: /tmp/main.exe
+        dest: /opt/www/germaniumhq_get
+
+    - name: Change the owner to nginx
+      file:
+        path: /opt/www/germaniumhq_get/main.exe
+        owner: 100
+        group: 101
+
+
