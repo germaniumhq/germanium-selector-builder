@@ -1,9 +1,16 @@
 from germanium.static import *
+import re
 
 
-def build_selector(element):
+def build_selector(element, code_mode):
+    from germaniumsb.main import CodeMode
+
     selector = construct_germanium_selector(element)
-    return selector_to_string(selector)
+
+    if code_mode == CodeMode.Germanium:
+        return selector_to_string(selector)
+
+    return selector_to_selenium_string(selector)
 
 
 def single_attribute_exact_match(selector, attributes, attribute_name):
@@ -132,6 +139,24 @@ def selector_to_string(selector):
     result += ')'
 
     return result
+
+
+def selector_to_selenium_string(selector):
+    if not selector:
+        return "# unable to build selector"
+
+    ge_xpath_selector = selector.get_selectors()[0]
+    result = 'XPath(' + double_quotes_text(remove_xpath_prefix(ge_xpath_selector)) + ')'
+    return result
+
+def remove_xpath_prefix(xpath_expression):
+    XPATH_PREFIX = re.compile(r"^xpath:.?(.*?)$")
+    m = XPATH_PREFIX.match(xpath_expression)
+
+    if not m:
+        return xpath_expression
+
+    return m.group(1)
 
 # Escapes the double quotes. If the string is unicode, it will
 # prefix the entry with an 'u'

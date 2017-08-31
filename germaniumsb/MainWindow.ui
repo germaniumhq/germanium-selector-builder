@@ -130,6 +130,8 @@
     </property>
     <addaction name="actionHighlight"/>
     <addaction name="actionPick"/>
+    <addaction name="separator"/>
+    <addaction name="actionSwitch_Selector_Mode"/>
    </widget>
    <addaction name="menuExecute"/>
    <addaction name="menuHelp"/>
@@ -153,6 +155,11 @@
   <action name="actionAbout_QT">
    <property name="text">
     <string>About QT</string>
+   </property>
+  </action>
+  <action name="actionSwitch_Selector_Mode">
+   <property name="text">
+    <string>Switch Selector Mode</string>
    </property>
   </action>
  </widget>

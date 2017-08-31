@@ -14,9 +14,11 @@ from germaniumsb.inject_code import inject_into_current_document, is_germaniumsb
     start_picking_into_current_document, stop_picking_into_current_document
 
 from germaniumsb.pick_element import get_picked_element
+from enum import Enum
 
 BROWSERS=["Chrome", "Firefox", "IE"]
 
+CodeMode = Enum('CodeMode', 'Selenium Germanium')
 
 def base_dir(sub_path=""):
     # pth is set by pyinstaller with the folder where the application
@@ -45,6 +47,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.status_label = QLabel()
         self.pick_timer = QTimer(self)
 
+        self.code_mode = CodeMode.Selenium
+        self.code_mode_label = QLabel("Mode: Selenium")
+
         self.setupUi(self)
         self.assign_widgets()
         self.show()
@@ -71,6 +76,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.statusbar.addWidget(QLabel("Status:"))
         self.statusbar.addWidget(self.status_label)
+        self.statusbar.addWidget(self.code_mode_label)
 
         self._setup_buttons_visibilities()
         self._show_application_status()
@@ -126,6 +132,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         highlight_shortcut.activated.connect(_(self.on_highlight_local_entry))
 
         self.pick_timer.timeout.connect(_(self.on_pick_timer))
+
+        self.actionSwitch_Selector_Mode.activated.connect(_(self.on_toggle_code_mode))
+
+    def on_toggle_code_mode(self):
+        self.code_mode = CodeMode.Selenium if self.code_mode == CodeMode.Germanium else CodeMode.Germanium
+        self.code_mode_label.setText('Mode: ' + self.code_mode.name)
 
     def _show_application_status(self):
         self._browser.before_enter(BrowserState.STOPPED,
@@ -281,7 +293,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def generate_selector(self, ev):
         try:
             element = ev.data
-            text_selector = build_selector(element)
+            text_selector = build_selector(element, self.code_mode)
             text_cursor = self.codeEdit.textCursor()
 
             insert_code_into_editor(text_cursor, text_selector)

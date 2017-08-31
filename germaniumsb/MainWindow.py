@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'germaniumsb/MainWindow.ui'
 #
-# Created: Sun Aug 20 16:51:10 2017
+# Created: Fri Sep  1 00:22:58 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -78,10 +78,14 @@ class Ui_MainWindow(object):
         self.actionPick.setObjectName("actionPick")
         self.actionAbout_QT = QtGui.QAction(MainWindow)
         self.actionAbout_QT.setObjectName("actionAbout_QT")
+        self.actionSwitch_Selector_Mode = QtGui.QAction(MainWindow)
+        self.actionSwitch_Selector_Mode.setObjectName("actionSwitch_Selector_Mode")
         self.menuHelp.addAction(self.action_About)
         self.menuHelp.addAction(self.actionAbout_QT)
         self.menuExecute.addAction(self.actionHighlight)
         self.menuExecute.addAction(self.actionPick)
+        self.menuExecute.addSeparator()
+        self.menuExecute.addAction(self.actionSwitch_Selector_Mode)
         self.menubar.addAction(self.menuExecute.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
@@ -103,4 +107,5 @@ class Ui_MainWindow(object):
         self.actionHighlight.setText(QtGui.QApplication.translate("MainWindow", "Highlight", None, QtGui.QApplication.UnicodeUTF8))
         self.actionPick.setText(QtGui.QApplication.translate("MainWindow", "Pick", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAbout_QT.setText(QtGui.QApplication.translate("MainWindow", "About QT", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionSwitch_Selector_Mode.setText(QtGui.QApplication.translate("MainWindow", "Switch Selector Mode", None, QtGui.QApplication.UnicodeUTF8))
 

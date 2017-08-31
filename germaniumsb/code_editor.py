@@ -3,7 +3,7 @@ import re
 
 
 def extract_code(full_text, cursor_position):
-    lines = str(full_text).split("\n")
+    lines = unicode(full_text).split("\n")
 
     no_spaces = re.compile(r"^[^\s].*$")
 
