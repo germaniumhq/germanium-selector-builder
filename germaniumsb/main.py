@@ -8,17 +8,15 @@ import traceback
 import os
 
 from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
+from germaniumsb.CodeMode import CodeMode
 from germaniumsb.build_selector import build_selector
 from germaniumsb.code_editor import extract_code, insert_code_into_editor
 from germaniumsb.inject_code import inject_into_current_document, is_germaniumsb_injected, \
     start_picking_into_current_document, stop_picking_into_current_document
 
 from germaniumsb.pick_element import get_picked_element
-from enum import Enum
 
 BROWSERS=["Chrome", "Firefox", "IE"]
-
-CodeMode = Enum('CodeMode', 'Selenium Germanium')
 
 def base_dir(sub_path=""):
     # pth is set by pyinstaller with the folder where the application
@@ -43,9 +41,10 @@ def _(callable):
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.pick_timer = QTimer(self)
+
         self._browser = BrowserStateMachine()
         self.status_label = QLabel()
-        self.pick_timer = QTimer(self)
 
         self.code_mode = CodeMode.Selenium
         self.code_mode_label = QLabel("Mode: Selenium")
@@ -59,7 +58,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def assign_widgets(self):
         icon = QtGui.QIcon()
         icon_path = os.path.join(base_dir("germaniumsb"), "favicon.ico")
-        print("Loading the icon from %s" % icon_path)
+
         icon.addPixmap(QtGui.QPixmap(icon_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(icon)
 
@@ -74,7 +73,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         cancel_pick_shortcut = QShortcut(QKeySequence(self.tr("Escape", "Execute|Cancel Pick")),
                                          self)
 
-        self.statusbar.addWidget(QLabel("Status:"))
         self.statusbar.addWidget(self.status_label)
         self.statusbar.addWidget(self.code_mode_label)
 
@@ -136,26 +134,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionSwitch_Selector_Mode.activated.connect(_(self.on_toggle_code_mode))
 
     def on_toggle_code_mode(self):
-        self.code_mode = CodeMode.Selenium if self.code_mode == CodeMode.Germanium else CodeMode.Germanium
+        if self.code_mode == CodeMode.Germanium:
+            self.code_mode = CodeMode.Selenium
+        else:
+            self.code_mode = CodeMode.Germanium
+
         self.code_mode_label.setText('Mode: ' + self.code_mode.name)
 
     def _show_application_status(self):
         self._browser.before_enter(BrowserState.STOPPED,
-                                   lambda ev: self.status_label.setText("Browser stopped"))
+                                   lambda ev: self.status_label.setText("Status: Browser stopped"))
         self._browser.before_enter(BrowserState.STARTED,
-                                   lambda ev: self.status_label.setText("Browser starting..."))
+                                   lambda ev: self.status_label.setText("Status: Browser starting..."))
         self._browser.before_enter(BrowserState.INJECTING_CODE,
-                                   lambda ev: self.status_label.setText("Loading monitoring..."))
+                                   lambda ev: self.status_label.setText("Status: Loading monitoring..."))
         self._browser.before_enter(BrowserState.READY,
-                                   lambda ev: self.status_label.setText('Ready'))
+                                   lambda ev: self.status_label.setText('Status: Ready'))
         self._browser.before_enter(BrowserState.PICKING,
-                                   lambda ev: self.status_label.setText("Picking element..."))
+                                   lambda ev: self.status_label.setText("Status: Picking element..."))
         self._browser.before_enter(BrowserState.PAUSED,
-                                   lambda ev: self.status_label.setText('Paused'))
+                                   lambda ev: self.status_label.setText('Status: Paused'))
         self._browser.before_enter(BrowserState.GENERATING_SELECTOR,
-                                   lambda ev: self.status_label.setText("Computing selector..."))
+                                   lambda ev: self.status_label.setText("Status: Computing selector..."))
         self._browser.before_enter(BrowserState.ERROR,
-                                   lambda ev: self.status_label.setText("Error :( ..."))
+                                   lambda ev: self.status_label.setText("Status: Error :( ..."))
 
     def _setup_buttons_visibilities(self):
         self.startBrowserButton.show()

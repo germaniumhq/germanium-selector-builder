@@ -1,11 +1,11 @@
 from germanium.static import *
 import re
 
+from germaniumsb.CodeMode import CodeMode
+
 
 def build_selector(element, code_mode):
-    from germaniumsb.main import CodeMode
-
-    selector = construct_germanium_selector(element)
+    selector = construct_germanium_selector(element, code_mode)
 
     if code_mode == CodeMode.Germanium:
         return selector_to_string(selector)
@@ -33,14 +33,10 @@ def single_attribute_exact_match(selector, attributes, attribute_name):
     return False
 
 
-
-def construct_germanium_selector(element):
-    if is_inside_table(element):
-        pass
-
+def construct_germanium_selector(element, code_mode):
     attributes = get_attributes(element)
 
-    if is_input_text(element):
+    if is_input_text(element) and code_mode == CodeMode.Germanium:
         selector = InputText()
 
         if single_attribute_exact_match(selector, attributes, 'name'):
@@ -55,11 +51,17 @@ def construct_germanium_selector(element):
         if is_unique(selector):
             return selector
 
-    #reference_text = get_reference_text(selector)
-    #if reference_text:
-    #    return reference_text
-
     selector = Element(tag_name=element.tag_name)
+
+    if element.tag_name == 'input':
+        if single_attribute_exact_match(selector, attributes, 'name'):
+            return selector
+
+        if single_attribute_exact_match(selector, attributes, 'placeholder'):
+            return selector
+
+        if single_attribute_exact_match(selector, attributes, 'type'):
+            return selector
 
     text = get_text(element)
     if text:
@@ -157,6 +159,7 @@ def remove_xpath_prefix(xpath_expression):
         return xpath_expression
 
     return m.group(1)
+
 
 # Escapes the double quotes. If the string is unicode, it will
 # prefix the entry with an 'u'
