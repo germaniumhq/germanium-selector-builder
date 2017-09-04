@@ -65,9 +65,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for browser in BROWSERS:
             self.browserCombo.addItem(browser)
 
-        pick_shortcut = QShortcut(QKeySequence(self.tr("Ctrl+K", "Execute|Pick")),
-                                  self)
-
         self.statusbar.addWidget(self.status_label)
         self.statusbar.addWidget(self.code_mode_label)
 
@@ -112,16 +109,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.startBrowserButton.clicked.connect(_(self._browser.start_browser))
 
         self.stopBrowserButton.clicked.connect(_(self._browser.close_browser))
-        self.pickElementButton.clicked.connect(_(self._browser.pick))
-        pick_shortcut.activated.connect(_(self._browser.pick))
 
         self.cancelPickButton.clicked.connect(_(self._browser.cancel_pick))
         self.cancelPickButton.setShortcut("Escape")
 
         self.liveButton.clicked.connect(_(self._browser.toggle_pause))
 
+        self.pickElementButton.clicked.connect(_(self._browser.pick))
+        self.actionPick.activated.connect(_(self._browser.pick))
+        self.actionPick.setShortcut("Ctrl+K")
+
         # this shouldn't need a new state
-        self.highlightElementButton.setShortcut("Ctrl+H")
         self.highlightElementButton.clicked.connect(_(self.on_highlight_local_entry))
         self.actionHighlight.setShortcut("Ctrl+H")
         self.actionHighlight.activated.connect(_(self.on_highlight_local_entry))
@@ -180,7 +178,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.after_enter(BrowserState.PAUSED, _(lambda: self.actionHighlight.setEnabled(False)))
         # pick button
         self._browser.after_enter(BrowserState.READY, _(self.pickElementButton.show))
+        self._browser.after_enter(BrowserState.READY, _(lambda: self.actionPick.setEnabled(True)))
         self._browser.after_leave(BrowserState.READY, _(self.pickElementButton.hide))
+        self._browser.after_leave(BrowserState.READY, _(lambda: self.actionPick.setEnabled(False)))
         # cancel pick button
         self._browser.after_enter(BrowserState.PICKING, _(self.cancelPickButton.show))
         self._browser.after_leave(BrowserState.PICKING, _(self.cancelPickButton.hide))

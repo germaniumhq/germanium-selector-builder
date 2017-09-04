@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'germaniumsb/MainWindow.ui'
 #
-# Created: Fri Sep  1 00:22:58 2017
+# Created: Mon Sep  4 23:41:56 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -73,8 +73,10 @@ class Ui_MainWindow(object):
         self.action_About = QtGui.QAction(MainWindow)
         self.action_About.setObjectName("action_About")
         self.actionHighlight = QtGui.QAction(MainWindow)
+        self.actionHighlight.setEnabled(False)
         self.actionHighlight.setObjectName("actionHighlight")
         self.actionPick = QtGui.QAction(MainWindow)
+        self.actionPick.setEnabled(False)
         self.actionPick.setObjectName("actionPick")
         self.actionAbout_QT = QtGui.QAction(MainWindow)
         self.actionAbout_QT.setObjectName("actionAbout_QT")

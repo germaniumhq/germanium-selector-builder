@@ -143,11 +143,17 @@
    </property>
   </action>
   <action name="actionHighlight">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Highlight</string>
    </property>
   </action>
   <action name="actionPick">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Pick</string>
    </property>
