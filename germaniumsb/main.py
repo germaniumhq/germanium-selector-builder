@@ -65,8 +65,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for browser in BROWSERS:
             self.browserCombo.addItem(browser)
 
-        highlight_shortcut = QShortcut(QKeySequence(self.tr("Ctrl+H", "Execute|Highlight")),
-                                       self)
         pick_shortcut = QShortcut(QKeySequence(self.tr("Ctrl+K", "Execute|Pick")),
                                   self)
 
@@ -123,8 +121,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.liveButton.clicked.connect(_(self._browser.toggle_pause))
 
         # this shouldn't need a new state
+        self.highlightElementButton.setShortcut("Ctrl+H")
         self.highlightElementButton.clicked.connect(_(self.on_highlight_local_entry))
-        highlight_shortcut.activated.connect(_(self.on_highlight_local_entry))
+        self.actionHighlight.setShortcut("Ctrl+H")
+        self.actionHighlight.activated.connect(_(self.on_highlight_local_entry))
 
         self.pick_timer.timeout.connect(_(self.on_pick_timer))
 
@@ -172,8 +172,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # highlight button
         self._browser.after_leave(BrowserState.STOPPED, _(self.highlightElementButton.show))
         self._browser.after_enter(BrowserState.STOPPED, _(self.highlightElementButton.hide))
+        self._browser.after_leave(BrowserState.STOPPED, _(lambda: self.actionHighlight.setEnabled(True)))
+        self._browser.after_enter(BrowserState.STOPPED, _(lambda: self.actionHighlight.setEnabled(False)))
         self._browser.after_leave(BrowserState.PAUSED, _(self.highlightElementButton.show))
         self._browser.after_enter(BrowserState.PAUSED, _(self.highlightElementButton.hide))
+        self._browser.after_leave(BrowserState.PAUSED, _(lambda: self.actionHighlight.setEnabled(True)))
+        self._browser.after_enter(BrowserState.PAUSED, _(lambda: self.actionHighlight.setEnabled(False)))
         # pick button
         self._browser.after_enter(BrowserState.READY, _(self.pickElementButton.show))
         self._browser.after_leave(BrowserState.READY, _(self.pickElementButton.hide))
