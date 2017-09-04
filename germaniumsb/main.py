@@ -70,9 +70,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         pick_shortcut = QShortcut(QKeySequence(self.tr("Ctrl+K", "Execute|Pick")),
                                   self)
 
-        cancel_pick_shortcut = QShortcut(QKeySequence(self.tr("Escape", "Execute|Cancel Pick")),
-                                         self)
-
         self.statusbar.addWidget(self.status_label)
         self.statusbar.addWidget(self.code_mode_label)
 
@@ -107,7 +104,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.before_leave(BrowserState.PICKING, timer_leave_state)
 
         self._browser.before_leave(BrowserState.PICKING, _(self.stop_picking_element))
-        self._browser.before_leave(BrowserState.GENERATING_SELECTOR, self.stop_picking_element)
+        self._browser.before_leave(BrowserState.GENERATING_SELECTOR, _(self.stop_picking_element))
 
         # self.codeEdit.setPlainText(build_selector(element))
 
@@ -121,7 +118,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         pick_shortcut.activated.connect(_(self._browser.pick))
 
         self.cancelPickButton.clicked.connect(_(self._browser.cancel_pick))
-        cancel_pick_shortcut.activated.connect(_(self._browser.cancel_pick))
+        self.cancelPickButton.setShortcut("Escape")
 
         self.liveButton.clicked.connect(_(self._browser.toggle_pause))
 
