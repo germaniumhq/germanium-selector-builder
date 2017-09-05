@@ -8,6 +8,7 @@ states:
   - INJECTING_CODE
   - INJECTING_CODE_FAILED
   - READY
+  - EDITING_CODE
   - PICKING
   - GENERATING_SELECTOR
   - PAUSED
@@ -44,6 +45,12 @@ transitions:
     close_browser: STOPPED
     inject_code: INJECTING_CODE
     toggle_pause: PAUSED
+    start_editing: EDITING_CODE
+  EDITING_CODE:
+    stop_editing: READY
+    pick: PICKING
+    close_browser: STOPPED
+    error: ERROR
   PICKING:
     generate_selector: GENERATING_SELECTOR
     cancel_pick: READY

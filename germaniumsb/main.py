@@ -131,6 +131,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.actionSwitch_Selector_Mode.activated.connect(_(self.on_toggle_code_mode))
 
+    def on_focus_changed(self, old_widget, new_widget):
+        if old_widget == self.codeEdit:
+            self._browser.stop_editing()
+            return
+
+        if new_widget == self.codeEdit:
+            self._browser.start_editing()
+            return
+
     def on_toggle_code_mode(self):
         if self.code_mode == CodeMode.Germanium:
             self.code_mode = CodeMode.Selenium
@@ -148,6 +157,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                    lambda ev: self.status_label.setText("Status: Loading monitoring..."))
         self._browser.before_enter(BrowserState.READY,
                                    lambda ev: self.status_label.setText('Status: Ready'))
+        self._browser.before_enter(BrowserState.EDITING_CODE,
+                                   lambda ev: self.status_label.setText("Status: Editing..."))
         self._browser.before_enter(BrowserState.PICKING,
                                    lambda ev: self.status_label.setText("Status: Picking element..."))
         self._browser.before_enter(BrowserState.PAUSED,
@@ -180,10 +191,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.after_leave(BrowserState.PAUSED, _(lambda: self.actionHighlight.setEnabled(True)))
         self._browser.after_enter(BrowserState.PAUSED, _(lambda: self.actionHighlight.setEnabled(False)))
         # pick button
-        self._browser.after_enter(BrowserState.READY, _(self.pickElementButton.show))
-        self._browser.after_enter(BrowserState.READY, _(lambda: self.actionPick.setEnabled(True)))
-        self._browser.after_leave(BrowserState.READY, _(self.pickElementButton.hide))
-        self._browser.after_leave(BrowserState.READY, _(lambda: self.actionPick.setEnabled(False)))
+        def pick_element_leave_state(ev):
+            if ev.target_state not in (BrowserState.READY, BrowserState.EDITING_CODE):
+                self.pickElementButton.hide()
+                self.actionPick.setEnabled(False)
+
+        def pick_element_enter_state(ev):
+            if ev.target_state in (BrowserState.READY, BrowserState.EDITING_CODE):
+                self.pickElementButton.show()
+                self.actionPick.setEnabled(True)
+
+        self._browser.after_enter(BrowserState.READY, pick_element_enter_state)
+        self._browser.after_enter(BrowserState.EDITING_CODE, pick_element_enter_state)
+        self._browser.after_leave(BrowserState.READY, pick_element_leave_state)
+        self._browser.after_leave(BrowserState.EDITING_CODE, pick_element_leave_state)
         # cancel pick button
         self._browser.after_enter(BrowserState.PICKING, _(self.cancelPickButton.show))
         self._browser.after_leave(BrowserState.PICKING, _(self.cancelPickButton.hide))
@@ -193,6 +214,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if ev.target_state not in (BrowserState.READY,
                                    BrowserState.PICKING,
                                    BrowserState.PAUSED,
+                                   BrowserState.EDITING_CODE,
                                    BrowserState.GENERATING_SELECTOR):
                 self.liveButton.hide()
 
@@ -356,7 +378,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     mainWin = MainWindow()
+
+    app.focusChanged.connect(mainWin.on_focus_changed)
+
     ret = app.exec_()
+    close_browser()
     sys.exit( ret )
-
-

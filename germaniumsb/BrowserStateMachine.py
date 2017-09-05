@@ -10,6 +10,7 @@ class BrowserState(Enum):
     INJECTING_CODE = 'INJECTING_CODE'
     INJECTING_CODE_FAILED = 'INJECTING_CODE_FAILED'
     READY = 'READY'
+    EDITING_CODE = 'EDITING_CODE'
     PICKING = 'PICKING'
     GENERATING_SELECTOR = 'GENERATING_SELECTOR'
     PAUSED = 'PAUSED'
@@ -25,11 +26,12 @@ STATE_INDEX = {
     'INJECTING_CODE': 4,
     'INJECTING_CODE_FAILED': 5,
     'READY': 6,
-    'PICKING': 7,
-    'GENERATING_SELECTOR': 8,
-    'PAUSED': 9,
-    'BROWSER_NOT_STARTED': 10,
-    'BROWSER_NOT_READY': 11,
+    'EDITING_CODE': 7,
+    'PICKING': 8,
+    'GENERATING_SELECTOR': 9,
+    'PAUSED': 10,
+    'BROWSER_NOT_STARTED': 11,
+    'BROWSER_NOT_READY': 12,
 }
 
 
@@ -127,6 +129,11 @@ register_transition('error', BrowserState.READY, BrowserState.ERROR)
 register_transition('close_browser', BrowserState.READY, BrowserState.STOPPED)
 register_transition('inject_code', BrowserState.READY, BrowserState.INJECTING_CODE)
 register_transition('toggle_pause', BrowserState.READY, BrowserState.PAUSED)
+register_transition('start_editing', BrowserState.READY, BrowserState.EDITING_CODE)
+register_transition('stop_editing', BrowserState.EDITING_CODE, BrowserState.READY)
+register_transition('pick', BrowserState.EDITING_CODE, BrowserState.PICKING)
+register_transition('close_browser', BrowserState.EDITING_CODE, BrowserState.STOPPED)
+register_transition('error', BrowserState.EDITING_CODE, BrowserState.ERROR)
 register_transition('generate_selector', BrowserState.PICKING, BrowserState.GENERATING_SELECTOR)
 register_transition('cancel_pick', BrowserState.PICKING, BrowserState.READY)
 register_transition('error', BrowserState.PICKING, BrowserState.ERROR)
@@ -154,6 +161,7 @@ class BrowserStateMachine(object):
         self._transition_listeners['INJECTING_CODE'] = EventListener()
         self._transition_listeners['INJECTING_CODE_FAILED'] = EventListener()
         self._transition_listeners['READY'] = EventListener()
+        self._transition_listeners['EDITING_CODE'] = EventListener()
         self._transition_listeners['PICKING'] = EventListener()
         self._transition_listeners['GENERATING_SELECTOR'] = EventListener()
         self._transition_listeners['PAUSED'] = EventListener()
@@ -166,6 +174,7 @@ class BrowserStateMachine(object):
         self._data_listeners['INJECTING_CODE'] = EventListener()
         self._data_listeners['INJECTING_CODE_FAILED'] = EventListener()
         self._data_listeners['READY'] = EventListener()
+        self._data_listeners['EDITING_CODE'] = EventListener()
         self._data_listeners['PICKING'] = EventListener()
         self._data_listeners['GENERATING_SELECTOR'] = EventListener()
         self._data_listeners['PAUSED'] = EventListener()
@@ -211,6 +220,12 @@ class BrowserStateMachine(object):
 
     def toggle_pause(self, data=None):
         return self.transition("toggle_pause", data)
+
+    def start_editing(self, data=None):
+        return self.transition("start_editing", data)
+
+    def stop_editing(self, data=None):
+        return self.transition("stop_editing", data)
 
     def cancel_pick(self, data=None):
         return self.transition("cancel_pick", data)
