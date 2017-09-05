@@ -151,6 +151,7 @@ def selector_to_selenium_string(selector):
     result = 'XPath(' + double_quotes_text(remove_xpath_prefix(ge_xpath_selector)) + ')'
     return result
 
+
 def remove_xpath_prefix(xpath_expression):
     XPATH_PREFIX = re.compile(r"^xpath:.?(.*?)$")
     m = XPATH_PREFIX.match(xpath_expression)

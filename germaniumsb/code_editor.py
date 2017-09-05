@@ -21,7 +21,7 @@ def extract_code(full_text, cursor_position):
 
         result.append(lines[i])
 
-    return str.join("\n", result)
+    return str.join("\n", result).strip()
 
 
 def insert_code_into_editor(cursor, text):

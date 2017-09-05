@@ -49,6 +49,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.code_mode = CodeMode.Selenium
         self.code_mode_label = QLabel("Mode: Selenium")
 
+        self.found_element_count_label = QLabel("Found: 0")
+
         self.setupUi(self)
         self.assign_widgets()
         self.show()
@@ -67,6 +69,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.statusbar.addWidget(self.status_label)
         self.statusbar.addWidget(self.code_mode_label)
+        self.statusbar.addWidget(self.found_element_count_label)
 
         self._setup_buttons_visibilities()
         self._show_application_status()
@@ -320,7 +323,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         code = extract_code(self.codeEdit.toPlainText(), cursor_location)
 
         selector = eval(code)
-        highlight(selector)
+
+        elements = selector.element_list()
+
+        self.found_element_count_label.setText("Found: %d" % len(elements))
+
+        if elements:
+            highlight(selector)
+        else:
+            QMessageBox.critical(self,
+                                 self.tr("No Element Found"),
+                                 "No element was found for the given selector.",
+                                 QMessageBox.Close)
 
     def on_error(self, ev):
         error_message = QMessageBox()
