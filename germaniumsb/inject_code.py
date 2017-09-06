@@ -9,7 +9,7 @@ def inject_into_current_document():
 
     :return:
     """
-    script = pkg_resources.resource_string(__name__, "../js/find_element_script.js")
+    script = pkg_resources.resource_string(__name__, "../js/main.js")
     if type(script) != 'str':  # it is bytes
         script = script.decode('utf-8')
 
