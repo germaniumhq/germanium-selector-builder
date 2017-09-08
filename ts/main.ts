@@ -23,7 +23,7 @@ function mouseDownEventHandler(ev) {
 
     if (window['__germanium_picking_mode_enabled']) {
         console.log('cancel mousedown event');
-        window["__germanium_element"] = ev.target;
+        window["__germanium_element"] = convertToSelector(ev.target);
         halt(ev);
         mouseDown = true;
         mouseDownCancelled = true;
@@ -77,9 +77,13 @@ document.addEventListener("mousemove", function (ev) {
 
 document.addEventListener("keyup", function(ev) {
     if (ev.ctrlKey && ev.keyCode == 16 || ev.shiftKey && ev.keyCode == 17) {
-        window["__germanium_element"] = document.elementFromPoint(cursorX, cursorY);
+        window["__germanium_element"] = convertToSelector(document.elementFromPoint(cursorX, cursorY));
     }
 }, true);
+
+function convertToSelector(element: Element) : string {
+    return "//" + element.tagName
+}
 
 // export global functions on the window object that will be used
 // by the selector builder.

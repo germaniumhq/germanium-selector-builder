@@ -5,12 +5,13 @@ from germaniumsb.CodeMode import CodeMode
 
 
 def build_selector(element, code_mode):
-    selector = construct_germanium_selector(element, code_mode)
-
-    if code_mode == CodeMode.Germanium:
-        return selector_to_string(selector)
-
-    return selector_to_selenium_string(selector)
+    return element
+    # selector = construct_germanium_selector(element, code_mode)
+    #
+    # if code_mode == CodeMode.Germanium:
+    #     return selector_to_string(selector)
+    #
+    # return selector_to_selenium_string(selector)
 
 
 def single_attribute_exact_match(selector, attributes, attribute_name):
