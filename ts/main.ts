@@ -1,3 +1,5 @@
+import { convertToSelector } from './convertToSelector'
+
 (function() {
 
 document.addEventListener("mousedown", mouseDownEventHandler, true);
@@ -81,9 +83,6 @@ document.addEventListener("keyup", function(ev) {
     }
 }, true);
 
-function convertToSelector(element: Element) : string {
-    return "//" + element.tagName
-}
 
 // export global functions on the window object that will be used
 // by the selector builder.
@@ -91,6 +90,8 @@ window["__germanium_loaded"] = true;
 window['__germanium_picking_mode_enabled'] = false;
 window["germaniumPickElement"] = germaniumPickElement;
 window["germaniumStopPickingElement"] = germaniumStopPickingElement;
+
+window["germaniumResolveElement"] = convertToSelector;
 
 console.log('germanium injected');
 

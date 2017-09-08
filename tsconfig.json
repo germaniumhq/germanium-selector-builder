@@ -1,10 +1,9 @@
 {
-    "compilerOptions": {
-		"target": "ES3",
-        "module": "none",
-        "sourceMap": true,
-        "typeRoots": [
-            "typings", "node_modules/@types", "node_modules"
-        ]
-	}
+  "compilerOptions": {
+    "target": "ES5",
+    "module": "commonjs",
+    "experimentalDecorators" : true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "jsx": "react"  }
 }

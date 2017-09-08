@@ -1,0 +1,18 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "test.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "main": "out/main.js",
+  "author": "Bogdan Mustiata <bogdan.mustiata@gmail.com>",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "copy-webpack-plugin": "^4.0.1",
+    "ts-loader": "1.3.3",
+    "typescript": "2.5.2",
+    "uglifyjs-webpack-plugin": "0.4.6",
+    "webpack": "^1.13.2"
+  }
+}
