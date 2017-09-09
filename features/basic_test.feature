@@ -15,3 +15,8 @@ Scenario: Resolving the google country text should work as expected
   When I try to resolve the element `Text("Österreich")`
   Then I get the xpath selector: u"//div[string()='Österreich'][contains(concat(' ', @class, ' '), ' logo-subtext ')]"
 
+Scenario: Resolving the bottom div should work as expected
+  Given I open the browser on the saved google page
+  When I try to resolve the element `Css("div.fbar")`
+  Then I get the xpath selector: "//div[contains(concat(' ', @class, ' '), ' fbar ')]"
+

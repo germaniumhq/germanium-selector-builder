@@ -58,8 +58,9 @@ function constructGermaniumSelector(element: Element) : GeElement {
 
     const text = getText(element);
 
-    // FIXME: if multiline it shold have a lower priority
-    if (text) {
+    // if multiline it shold have a lower priority. multiple spaces means
+    // that probably there are multiple elements contained.
+    if (text && !/[\n\r]/.test(text) && !/  /.test(text)) {
         selector.exactText = text
 
         if (isUnique(selector)) {
@@ -87,12 +88,30 @@ function constructGermaniumSelector(element: Element) : GeElement {
     }
 
     if (attributes['class']) {
-        // FIXME: should try each class in turn, then only
-        // use all the classes
-        selector.cssClasses = attributes['class'].split(/\s+/)
+        // we try each class in turn, then if not matching we try
+        // using all the classes
+        const cssClasses =  attributes['class'].split(/\s+/)
+
+        for (let i = 0; i < cssClasses.length; i++) {
+            selector.cssClasses = [ cssClasses[i] ]
+            if (isUnique(selector)) {
+                return selector;
+            }
+        }
+
+        selector.cssClasses = cssClasses;
 
         if (isUnique(selector)) {
             return selector
+        }
+    }
+
+    // if multiline it shold have a lower priority
+    if (text && !selector.exactText) {
+        selector.exactText = text
+
+        if (isUnique(selector)) {
+            return selector;
         }
     }
 
