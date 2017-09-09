@@ -26,9 +26,9 @@ def resolve_germanium_selector_in_js(context, source):
     context.resolved_selector = js('return germaniumResolveElement(arguments[0])', element)
 
 
-@step("I get the xpath selector: \"(.*?)\"")
+@step("I get the xpath selector: (u?\".*?\")")
 def validate_xpath_selector(context, expected_selector):
-    assertEqual('XPath("' + expected_selector + '")', context.resolved_selector)
+    assertEqual('XPath(' + expected_selector + ')', context.resolved_selector)
 
 
 def read_file(path):

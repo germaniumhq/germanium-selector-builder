@@ -34,6 +34,15 @@ function constructGermaniumSelector(element: Element) : GeElement {
     const selector = new GeElement(element.tagName)
 
     if (selector.tagName == 'input') {
+        if (attributes.type == "button" || attributes.type == "submit") {
+            const buttonSelector = selector.clone()
+
+            buttonSelector.exactAttributes.type = attributes.type
+            if (singleAttributeExactMatch(buttonSelector, attributes, 'value')) {
+                return buttonSelector
+            }
+        }
+
         if (singleAttributeExactMatch(selector, attributes, 'name')) {
             return selector;
         }

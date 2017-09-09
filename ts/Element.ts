@@ -5,16 +5,26 @@ export interface IElementConfig {
     id? : string
     exactText? : string
     containsText? : string
-    cssClasses? : string | Array<string>
+    cssClasses? : Array<string>
     exactAttributes? : IExactAttributes
     containsAttributes? : IExactAttributes
     extraXPath? : string
 }
 
+function cloneAttributes(attrs: IExactAttributes) : IExactAttributes {
+    const result = {}
+
+    for (let k in attrs) {
+        result[k] = attrs[k]
+    }
+
+    return result
+}
+
 /**
  * An element equivalent from Germanium.
  */
-export class GeElement {
+export class GeElement implements IElementConfig {
     public tagName: string;
     public index: number;
     public containsText: string;
@@ -30,6 +40,20 @@ export class GeElement {
         if (config && config.id) {
             this.exactAttributes.id = config.id;
         }
+
+        if (config) {
+            this.index = config.index
+            this.containsText = config.containsText
+            this.exactText = config.exactText
+            this.cssClasses = config.cssClasses ? config.cssClasses.slice() : []
+            this.exactAttributes = config.exactAttributes ? cloneAttributes(config.exactAttributes) : {}
+            this.containsAttributes = config.containsAttributes ? cloneAttributes(config.containsAttributes) : {}
+            this.extraXPath == config.extraXPath
+        }
+    }
+
+    public clone() : GeElement {
+        return new GeElement(this.tagName, this)
     }
 
     getSelector() : string {
