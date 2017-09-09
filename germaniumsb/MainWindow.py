@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'germaniumsb/MainWindow.ui'
 #
-# Created: Tue Sep  5 23:30:38 2017
+# Created: Sun Sep 10 00:05:37 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -38,12 +38,15 @@ class Ui_MainWindow(object):
         self.liveButton = QtGui.QPushButton(self.centralwidget)
         self.liveButton.setCheckable(True)
         self.liveButton.setChecked(True)
+        self.liveButton.setFlat(False)
         self.liveButton.setObjectName("liveButton")
         self.horizontalLayout.addWidget(self.liveButton)
         self.highlightElementButton = QtGui.QPushButton(self.centralwidget)
         self.highlightElementButton.setObjectName("highlightElementButton")
         self.horizontalLayout.addWidget(self.highlightElementButton)
-        self.pickElementButton = QtGui.QPushButton(self.centralwidget)
+        self.pickElementButton = QtGui.QToolButton(self.centralwidget)
+        self.pickElementButton.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
+        self.pickElementButton.setToolButtonStyle(QtCore.Qt.ToolButtonTextOnly)
         self.pickElementButton.setObjectName("pickElementButton")
         self.horizontalLayout.addWidget(self.pickElementButton)
         self.cancelPickButton = QtGui.QPushButton(self.centralwidget)

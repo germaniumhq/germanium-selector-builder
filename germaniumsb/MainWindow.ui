@@ -67,6 +67,9 @@
           <property name="checked">
            <bool>true</bool>
           </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
          </widget>
         </item>
         <item>
@@ -77,9 +80,15 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pickElementButton">
+         <widget class="QToolButton" name="pickElementButton">
           <property name="text">
            <string>Pick</string>
+          </property>
+          <property name="popupMode">
+           <enum>QToolButton::MenuButtonPopup</enum>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextOnly</enum>
           </property>
          </widget>
         </item>

@@ -118,6 +118,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.liveButton.clicked.connect(_(self._browser.toggle_pause))
 
+        pickElementMenu = QMenu(self.pickElementButton)
+        pickElementMenu.addAction(QAction("+1 reference", pickElementMenu))
+        pickElementMenu.addAction(QAction("+2 references", pickElementMenu))
+        self.pickElementButton.setMenu(pickElementMenu)
+
         self.pickElementButton.clicked.connect(_(self._browser.pick))
         self.actionPick.activated.connect(_(self._browser.pick))
         self.actionPick.setShortcut("Ctrl+K")
