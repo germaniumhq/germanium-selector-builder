@@ -40,7 +40,7 @@ export class GeElement {
         }
 
         if (this.exactText) {
-            xpathLocator += `[string() = '${this.exactText}']`
+            xpathLocator += `[string()='${this.exactText}']`
         }
 
         for (let i = 0; i < this.cssClasses.length; i++) {
@@ -49,7 +49,7 @@ export class GeElement {
         }
 
         for (let k in this.exactAttributes) {
-            xpathLocator += `[@${k} = '${this.exactAttributes[k]}']`
+            xpathLocator += `[@${k}='${this.exactAttributes[k]}']`
         }
 
         for (let k in this.containsAttributes) {

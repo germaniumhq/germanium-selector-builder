@@ -118,7 +118,13 @@ function doubleQuotesText(value: string) {
 }
 
 function removePrefix(value: string) : string {
-    return value.substring(value.indexOf(":"))
+    const onlySelector = value.substring(value.indexOf(":") + 1)
+
+    if (/^\.\/\//.test(onlySelector)) {
+        return onlySelector.substring(1)
+    }
+
+    return onlySelector
 }
 
 function isPureAscii(value : string) : boolean {
