@@ -8,8 +8,6 @@ import traceback
 import os
 
 from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
-from germaniumsb.CodeMode import CodeMode
-from germaniumsb.build_selector import build_selector
 from germaniumsb.code_editor import extract_code, insert_code_into_editor
 from germaniumsb.inject_code import inject_into_current_document, is_germaniumsb_injected, \
     start_picking_into_current_document, stop_picking_into_current_document
@@ -46,9 +44,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser = BrowserStateMachine()
         self.status_label = QLabel()
 
-        self.code_mode = CodeMode.Selenium
-        self.code_mode_label = QLabel("Mode: Selenium")
-
         self.found_element_count_label = QLabel("Found: 0")
 
         self.setupUi(self)
@@ -68,7 +63,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.browserCombo.addItem(browser)
 
         self.statusbar.addWidget(self.status_label)
-        self.statusbar.addWidget(self.code_mode_label)
         self.statusbar.addWidget(self.found_element_count_label)
 
         self._setup_buttons_visibilities()
@@ -101,10 +95,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.before_leave(BrowserState.READY, timer_leave_state)
         self._browser.before_leave(BrowserState.PICKING, timer_leave_state)
 
-        self._browser.before_leave(BrowserState.PICKING, _(self.stop_picking_element))
-        self._browser.before_leave(BrowserState.GENERATING_SELECTOR, _(self.stop_picking_element))
-
-        # self.codeEdit.setPlainText(build_selector(element))
+        self._browser.before_leave(BrowserState.PICKING, self.stop_picking_element)
+        self._browser.before_leave(BrowserState.GENERATING_SELECTOR, self.stop_picking_element)
 
         #=====================================================
         # listen for events
@@ -134,8 +126,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.pick_timer.timeout.connect(_(self.on_pick_timer))
 
-        self.actionSwitch_Selector_Mode.activated.connect(_(self.on_toggle_code_mode))
-
     def on_focus_changed(self, old_widget, new_widget):
         if old_widget == self.codeEdit:
             self._browser.stop_editing()
@@ -144,14 +134,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if new_widget == self.codeEdit:
             self._browser.start_editing()
             return
-
-    def on_toggle_code_mode(self):
-        if self.code_mode == CodeMode.Germanium:
-            self.code_mode = CodeMode.Selenium
-        else:
-            self.code_mode = CodeMode.Germanium
-
-        self.code_mode_label.setText('Mode: ' + self.code_mode.name)
 
     def _show_application_status(self):
         self._browser.before_enter(BrowserState.STOPPED,
@@ -325,8 +307,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def generate_selector(self, ev):
         try:
-            element = ev.data
-            text_selector = build_selector(element, self.code_mode)
+            text_selector = ev.data
             text_cursor = self.codeEdit.textCursor()
 
             insert_code_into_editor(text_cursor, text_selector)

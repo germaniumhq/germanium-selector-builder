@@ -1,0 +1,19 @@
+name: Mouse
+package: .
+states:
+  - NOT_PRESSED
+  - MOUSE_DOWN
+  - MOUSE_UP
+  - PICKING
+transitions:
+  NOT_PRESSED:
+    mouseDown: MOUSE_DOWN
+    startPicking: PICKING
+  MOUSE_DOWN:
+    mouseUp: MOUSE_UP
+  MOUSE_UP:
+    click: NOT_PRESSED
+    doubleClick: NOT_PRESSED
+    contextMenu: NOT_PRESSED
+  PICKING:
+    stopPicking: NOT_PRESSED

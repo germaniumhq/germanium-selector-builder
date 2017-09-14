@@ -1,0 +1,22 @@
+name: Pick
+package: .
+states:
+- READY
+- PICKING
+- MOUSE_DOWN
+- MOUSE_UP
+- CLICK
+- SELECTED
+transitions:
+  READY:
+    startPicking: PICKING
+    ctrlShift: SELECTED
+  PICKING:
+    cancelPick: READY
+    selected: SELECTED
+  SELECTED:
+    ready: READY
+properties:
+  ctrlDown: boolean
+  shiftDown: boolean
+  foundSelector: string

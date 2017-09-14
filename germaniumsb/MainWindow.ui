@@ -140,7 +140,6 @@
     <addaction name="actionHighlight"/>
     <addaction name="actionPick"/>
     <addaction name="separator"/>
-    <addaction name="actionSwitch_Selector_Mode"/>
    </widget>
    <addaction name="menuExecute"/>
    <addaction name="menuHelp"/>

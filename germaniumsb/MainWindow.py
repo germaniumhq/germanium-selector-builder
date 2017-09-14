@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'germaniumsb/MainWindow.ui'
 #
-# Created: Sun Sep 10 00:05:37 2017
+# Created: Mon Sep 11 22:53:24 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -90,7 +90,6 @@ class Ui_MainWindow(object):
         self.menuExecute.addAction(self.actionHighlight)
         self.menuExecute.addAction(self.actionPick)
         self.menuExecute.addSeparator()
-        self.menuExecute.addAction(self.actionSwitch_Selector_Mode)
         self.menubar.addAction(self.menuExecute.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 

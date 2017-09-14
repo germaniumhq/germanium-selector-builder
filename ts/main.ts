@@ -1,73 +1,70 @@
 import { convertToSelector } from './convertToSelector'
+import { PickState, PickStateMachine } from './PickStateMachine'
+import { MouseState, MouseStateMachine } from './MouseStateMachine'
 
 (function() {
+
+const pickState = new PickStateMachine()
+const mouseState = new MouseStateMachine()
 
 document.addEventListener("mousedown", mouseDownEventHandler, true);
 document.addEventListener("mouseup", mouseUpEventHandler, true);
 document.addEventListener("click", mouseClickEventHandler, true);
 
-germaniumStopPickingElement();
-
-var mouseDown = false;
-var mouseDownCancelled = false;
-var captureTimerRunning = false;
-
-function halt(ev) {
+function halt(ev: Event) {
     ev.preventDefault();
     ev.stopImmediatePropagation();
     ev.stopPropagation();
 }
 
-function mouseDownEventHandler(ev) {
-    if (captureTimerRunning) {
-        return halt(ev);
-    }
+pickState.onData(PickState.PICKING, 'mouse_down', (ev) => {
+    console.log('pick' + ev.data.target);
+    pickState.foundSelector = convertToSelector(ev.data.target);
+    return PickState.SELECTED;
+});
 
-    if (window['__germanium_picking_mode_enabled']) {
-        console.log('cancel mousedown event');
-        window["__germanium_element"] = convertToSelector(ev.target);
-        halt(ev);
-        mouseDown = true;
-        mouseDownCancelled = true;
-        captureTimerRunning = true;
+mouseState.onData(MouseState.NOT_PRESSED, 'mouse_down', (ev) => {
+    ev.consume();
+    return MouseState.MOUSE_DOWN;
+});
 
-        setTimeout(function() {
-            captureTimerRunning = false;
-        }, 1000);
+mouseState.onData(MouseState.MOUSE_DOWN, 'mouse_up', (ev) => {
+    ev.consume();
+    return MouseState.MOUSE_UP;
+});
 
-        return false;
-    }
+mouseState.onData(MouseState.MOUSE_UP, 'click', (ev) => {
+    ev.consume();
+    return MouseState.NOT_PRESSED;
+});
 
+mouseState.onData(null, (ev) => {
+    console.log('mouse state is: ' + mouseState.state)
+    halt(ev.data);
+});
+
+
+function mouseDownEventHandler(ev: MouseEvent) {
+    pickState.sendData('mouse_down', ev);
+    mouseState.sendData('mouse_down', ev)
 }
 
 function mouseUpEventHandler(ev) {
-    if (window['__germanium_picking_mode_enabled'] || mouseDown || captureTimerRunning) {
-        console.log('cancel mouseup event');
-        halt(ev);
-        mouseDown = false;
-
-        return false;
-    }
+    mouseState.sendData('mouse_up', ev)
 }
 
 function mouseClickEventHandler(ev) {
-    if (window['__germanium_picking_mode_enabled'] || mouseDownCancelled || captureTimerRunning) {
-        console.log('cancel click event');
-        halt(ev);
-        mouseDownCancelled = false;
-
-        return false;
-    }
+    mouseState.sendData('click', ev)
 }
 
 function germaniumPickElement() {
-    console.log('picking element');
-    window['__germanium_picking_mode_enabled'] = true;
+    pickState.startPicking();
+    mouseState.startPicking();
 }
 
 function germaniumStopPickingElement() {
-    console.log('STOPPED picking element');
-    window['__germanium_picking_mode_enabled'] = false;
+    pickState.cancelPick();
+    mouseState.stopPicking();
 }
 
 var cursorX;
@@ -77,22 +74,69 @@ document.addEventListener("mousemove", function (ev) {
     cursorY = ev.pageY;
 }, true);
 
-document.addEventListener("keyup", function(ev) {
-    if (ev.ctrlKey && ev.keyCode == 16 || ev.shiftKey && ev.keyCode == 17) {
-        window["__germanium_element"] = convertToSelector(document.elementFromPoint(cursorX, cursorY));
+document.addEventListener("keydown", function(ev) {
+    if (ev.keyCode == 16) {
+        pickState.shiftDown = true
+    }
+
+    if (ev.keyCode == 17) {
+        pickState.ctrlDown = true
+    }
+
+    if (pickState.ctrlDown && pickState.shiftDown) {
+        pickState.ctrlShift(document.elementFromPoint(cursorX, cursorY))
     }
 }, true);
 
+document.addEventListener("keyup", function(ev) {
+    if (ev.keyCode == 16) {
+        pickState.shiftDown = false
+    }
+
+    if (ev.keyCode == 17) {
+        pickState.ctrlDown = false
+    }
+}, true);
+
+/**
+ * If we have an element, we return it, and stop the picking.
+ * 
+ */
+function germaniumGetPickedElement() {
+    if (!pickState.foundSelector) {
+        return null
+    }
+
+    // if we cannot switch to ready, we wait first for the
+    // events to be processed, and only then we return the
+    // selector
+    if (pickState.ready() != PickState.READY) {
+        return null
+    }
+
+    mouseState.stopPicking();
+
+    const result = pickState.foundSelector
+    pickState.foundSelector = null
+    
+    return result
+}
 
 // export global functions on the window object that will be used
 // by the selector builder.
 window["__germanium_loaded"] = true;
-window['__germanium_picking_mode_enabled'] = false;
+
+// these are always exported
 window["germaniumPickElement"] = germaniumPickElement;
 window["germaniumStopPickingElement"] = germaniumStopPickingElement;
+window["germaniumGetPickedElement"] = germaniumGetPickedElement;
 
-window["germaniumResolveElement"] = convertToSelector;
-
-console.log('germanium injected');
+if (window["__germaniumDebugMode"]) {
+    window["germaniumResolveElement"] = convertToSelector;
+    window["mouseState"] = mouseState;
+    window["pickState"] = pickState;
+    window["PickState"] = PickState;
+    window["MouseState"] = MouseState;
+}
 
 })();

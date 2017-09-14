@@ -10,8 +10,7 @@ def get_picked_element():
     :return:
     """
     def fetch_element():
-        element = js('var element = window["__germanium_element"]; '
-                     'window["__germanium_element"] = null; '
+        element = js('var element = window["germaniumGetPickedElement"] && window["germaniumGetPickedElement"](); '
                      'return element;')
 
         return element
