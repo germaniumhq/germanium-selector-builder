@@ -44,6 +44,27 @@ def resolve_germanium_selector_in_js(context, source):
     assertEqual(js('return mouseState.state;'), 'NOT_PRESSED')
 
 
+@step('I start picking elements')
+def start_picking_the_element(context):
+    # we inject first the code.
+    loaded_code = read_file("js/main.js")
+
+    js('window["__germaniumDebugMode"] = true;')
+    js(loaded_code)
+    js('germaniumPickElement()')
+
+
+@step('I cancel picking elements')
+def cancel_picking_the_element(context):
+    js('germaniumStopPickingElement()')
+
+
+@step('the state of the browser is correct and accepting commands')
+def is_the_correct_state(context):
+    assertEqual(js('return pickState.state;'), 'READY')
+    assertEqual(js('return mouseState.state;'), 'NOT_PRESSED')
+
+
 @step("I get the xpath selector: (u?\".*?\")")
 def validate_xpath_selector(context, expected_selector):
     assertEqual('XPath(' + expected_selector + ')', context.resolved_selector)
