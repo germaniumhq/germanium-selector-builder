@@ -55,7 +55,7 @@ def _run_in_all_iframes_internal(code, error_messages=None, checked_frames=None)
     try:
         result = code()
 
-        if result:
+        if result is not None:
             return result, error_happened, error_messages
     except Exception as e:
         print(e)
@@ -80,7 +80,7 @@ def _run_in_all_iframes_internal(code, error_messages=None, checked_frames=None)
 
         error_happened |= iframe_error_happened
 
-        if iframe_result and not result:
+        if iframe_result is not None and result is None:
             return iframe_result, error_happened, error_messages
 
     return result, error_happened, error_messages

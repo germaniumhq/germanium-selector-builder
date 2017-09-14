@@ -10,7 +10,7 @@ import os
 from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
 from germaniumsb.code_editor import extract_code, insert_code_into_editor
 from germaniumsb.inject_code import inject_into_current_document, is_germaniumsb_injected, \
-    start_picking_into_current_document, stop_picking_into_current_document
+    start_picking_into_current_document, stop_picking_into_current_document, run_in_all_iframes
 
 from germaniumsb.pick_element import get_picked_element
 
@@ -325,17 +325,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         selector = eval(code)
 
-        elements = selector.element_list()
+        def highlight_selector():
+            elements = selector.element_list()
 
-        self.found_element_count_label.setText("Found: %d" % len(elements))
+            if elements:
+                highlight(selector)
+                return len(elements)
 
-        if elements:
-            highlight(selector)
+        found_elements, error_happened, error_messages = \
+            run_in_all_iframes(highlight_selector)
+
+        if found_elements is not None:
+            self.found_element_count_label.setText("Found: %d" % found_elements)
         else:
+            self.found_element_count_label.setText("Found: 0")
             QMessageBox.critical(self,
                                  self.tr("No Element Found"),
                                  "No element was found for the given selector.",
                                  QMessageBox.Close)
+
 
     def on_error(self, ev):
         error_message = QMessageBox()
