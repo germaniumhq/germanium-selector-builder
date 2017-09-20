@@ -20,10 +20,10 @@ def inject_into_current_document():
     return run_in_all_iframes(inject_into_document)
 
 
-def start_picking_into_current_document():
+def start_picking_into_current_document(count):
     def start_picking_element():
         if not js('return window["__germanium_picking_mode_enabled"];'):
-            js('germaniumPickElement();')
+            js('germaniumPickElement(%s);' % count)
 
     return run_in_all_iframes(start_picking_element)
 

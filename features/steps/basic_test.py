@@ -44,6 +44,26 @@ def resolve_germanium_selector_in_js(context, source):
     assertEqual(js('return mouseState.state;'), 'NOT_PRESSED')
 
 
+@step("I try to pick (\\d+) elements: `(.*?)`")
+def pick_two_elements(context, element_count, source):
+    # we inject first the code.
+    loaded_code = read_file("js/main.js")
+
+    js('window["__germaniumDebugMode"] = true;')
+    js(loaded_code)
+    js('germaniumPickElement(2)')
+
+    click(eval(source, globals(), dict()))
+
+
+@step("using a reference of: `(.*?)`")
+def pick_second_element(context, source):
+    click(eval(source, globals(), dict()))
+    context.resolved_selector = js('return germaniumGetPickedElement()')
+
+    assertEqual(js('return pickState.state;'), 'READY')
+    assertEqual(js('return mouseState.state;'), 'NOT_PRESSED')
+
 @step('I start picking elements')
 def start_picking_the_element(context):
     # we inject first the code.

@@ -1,4 +1,4 @@
-import { constructGermaniumSelector } from './constructGermaniumSelector';
+import { constructGermaniumSelector, removeXPathPrefix } from './constructGermaniumSelector';
 
 /**
  * Computes a path from the parent to the target node.
@@ -31,5 +31,5 @@ export function xpathRelativize(parentReferenceXPath: string,
         return parentReferenceXPath + "/ancestor::" + constructGermaniumSelector(commonParent) + targetNodeXPath
     }
 
-    return parentReferenceXPath + "/.." + targetNodeXPath
+    return parentReferenceXPath + "/.." + removeXPathPrefix(targetNodeXPath)
 }

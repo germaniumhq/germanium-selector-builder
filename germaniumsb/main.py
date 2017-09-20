@@ -77,7 +77,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.before_leave(BrowserState.STOPPED, _(self.start_browser))
         self._browser.after_enter(BrowserState.STARTED, _(self._browser.inject_code))
         self._browser.after_enter(BrowserState.INJECTING_CODE, _(self.inject_code))
-        self._browser.after_enter(BrowserState.PICKING, _(self.start_picking_element))
+        self._browser.after_enter(BrowserState.PICKING, lambda ev: self.start_picking_element(1))
         self._browser.after_enter(BrowserState.BROWSER_NOT_STARTED, _(self.browser_not_available))
         self._browser.after_enter(BrowserState.BROWSER_NOT_READY, _(self.browser_not_available))
         self._browser.after_enter(BrowserState.INJECTING_CODE_FAILED, self.injecting_code_failed)
@@ -111,8 +111,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.liveButton.clicked.connect(_(self._browser.toggle_pause))
 
         pickElementMenu = QMenu(self.pickElementButton)
-        pickElementMenu.addAction(QAction("+1 reference", pickElementMenu))
-        pickElementMenu.addAction(QAction("+2 references", pickElementMenu))
+        pick_2_action = QAction("+1 reference", pickElementMenu)
+        pick_2_action.activated.connect(lambda: self.start_picking_element(2))
+        pickElementMenu.addAction(pick_2_action)
+        pick_3_action = QAction("+2 references", pickElementMenu)
+        pick_3_action.activated.connect(lambda: self.start_picking_element(3))
+        pickElementMenu.addAction(pick_3_action)
         self.pickElementButton.setMenu(pickElementMenu)
 
         self.pickElementButton.clicked.connect(_(self._browser.pick))
@@ -238,8 +242,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self._browser.error(e)
             return
 
-    def start_picking_element(self):
-        _, error_happened, error_messages = start_picking_into_current_document()
+    def start_picking_element(self, count):
+        _, error_happened, error_messages = start_picking_into_current_document(count)
 
         if error_happened:
             self._browser.error_injecting_code(error_messages)

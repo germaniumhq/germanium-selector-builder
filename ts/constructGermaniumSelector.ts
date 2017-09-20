@@ -94,6 +94,16 @@ export function constructGermaniumSelector(element: Element) : GeElement {
     return selector;
 }
 
+export function removeXPathPrefix(value: string) : string {
+    const onlySelector = value.substring(value.indexOf(":") + 1)
+
+    if (/^\.\/\//.test(onlySelector)) {
+        return onlySelector.substring(1)
+    }
+
+    return onlySelector
+}
+
 function singleAttributeExactMatch(selector: GeElement,
     attributes: { [name: string] : string },
     attributeName: string) : boolean {

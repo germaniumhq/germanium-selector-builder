@@ -1,6 +1,6 @@
 
 import { GeElement } from './Element'
-import { constructGermaniumSelector } from './constructGermaniumSelector'
+import { constructGermaniumSelector, removeXPathPrefix } from './constructGermaniumSelector'
 import { xpathRelativize } from './xpathRelativize'
 
 export function convertToSelector(elements: Array<Element>) : string {
@@ -19,12 +19,12 @@ export function convertToSelector(elements: Array<Element>) : string {
         );
     }
 
-    return xpathRelativize(
+    return "XPath(" + doubleQuotesText(xpathRelativize(
         constructGermaniumSelector(elements[0]).asXPath(),
         elementPathFromBody(elements[0]),
         constructGermaniumSelector(elements[1]).asXPath(),
         elementPathFromBody(elements[1])
-    );
+    )) + ")";
 }
 
 function elementPathFromBody(element: Element) : Array<Element> {
@@ -47,10 +47,10 @@ function selectorToSeleniumString(selector: GeElement) : string {
     const strSelector = selector.getSelector()
 
     if (isXPath(strSelector)) {
-        return `XPath(${doubleQuotesText(removePrefix(strSelector))})`
+        return `XPath(${doubleQuotesText(removeXPathPrefix(strSelector))})`
     }
 
-    return `Css(${doubleQuotesText(removePrefix(strSelector))})`
+    return `Css(${doubleQuotesText(removeXPathPrefix(strSelector))})`
     
 }
 
@@ -64,16 +64,6 @@ function doubleQuotesText(value: string) {
     }
 
     return '"' + value.replace('"', '\\"') + '"'    
-}
-
-function removePrefix(value: string) : string {
-    const onlySelector = value.substring(value.indexOf(":") + 1)
-
-    if (/^\.\/\//.test(onlySelector)) {
-        return onlySelector.substring(1)
-    }
-
-    return onlySelector
 }
 
 function isPureAscii(value : string) : boolean {
