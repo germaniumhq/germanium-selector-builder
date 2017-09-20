@@ -20,3 +20,6 @@ properties:
   ctrlDown: boolean
   shiftDown: boolean
   foundSelector: string
+  selectedElements: Array<Element>
+  pickCount: number
+

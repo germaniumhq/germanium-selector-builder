@@ -17,10 +17,22 @@ function halt(ev: Event) {
     ev.stopPropagation();
 }
 
+// we need to specify how many items we're going to pick.
+pickState.afterEnter(PickState.PICKING, function(ev) {
+    console.log(ev, arguments)
+    pickState.pickCount = ev.data.count
+    pickState.selectedElements = []
+});
+
 pickState.onData(PickState.PICKING, 'mouse_down', (ev) => {
     console.log('pick' + ev.data.target);
-    pickState.foundSelector = convertToSelector(ev.data.target);
-    return PickState.SELECTED;
+    pickState.pickCount--;
+    pickState.selectedElements.push(ev.data.target)
+
+    if (pickState.pickCount == 0) {
+        pickState.foundSelector = convertToSelector(pickState.selectedElements);
+        return PickState.SELECTED;
+    }
 });
 
 mouseState.onData(MouseState.NOT_PRESSED, 'mouse_down', (ev) => {
@@ -57,8 +69,8 @@ function mouseClickEventHandler(ev) {
     mouseState.sendData('click', ev)
 }
 
-function germaniumPickElement() {
-    pickState.startPicking();
+function germaniumPickElement(elementCount: number) {
+    pickState.startPicking({count: elementCount});
     mouseState.startPicking();
 }
 

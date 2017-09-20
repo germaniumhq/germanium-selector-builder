@@ -109,6 +109,8 @@ export class PickStateMachine {
     ctrlDown : boolean;
     shiftDown : boolean;
     foundSelector : string;
+    selectedElements : Array<Element>;
+    pickCount : number;
 
     private currentState: PickState = null
     private initialState: PickState

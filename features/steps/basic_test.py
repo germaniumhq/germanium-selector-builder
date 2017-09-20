@@ -35,7 +35,7 @@ def resolve_germanium_selector_in_js(context, source):
 
     js('window["__germaniumDebugMode"] = true;')
     js(loaded_code)
-    js('germaniumPickElement()')
+    js('germaniumPickElement(1)')
 
     click(eval(source, globals(), dict()))
 
@@ -51,7 +51,7 @@ def start_picking_the_element(context):
 
     js('window["__germaniumDebugMode"] = true;')
     js(loaded_code)
-    js('germaniumPickElement()')
+    js('germaniumPickElement(1)')
 
 
 @step('I cancel picking elements')
