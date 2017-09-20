@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'germaniumsb/MainWindow.ui'
 #
-# Created: Mon Sep 11 22:53:24 2017
+# Created: Wed Sep 20 22:37:42 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PySide import QtCore, QtGui
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
+        MainWindow.resize(800, 608)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtGui.QGridLayout(self.centralwidget)
@@ -45,6 +45,11 @@ class Ui_MainWindow(object):
         self.highlightElementButton.setObjectName("highlightElementButton")
         self.horizontalLayout.addWidget(self.highlightElementButton)
         self.pickElementButton = QtGui.QToolButton(self.centralwidget)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pickElementButton.sizePolicy().hasHeightForWidth())
+        self.pickElementButton.setSizePolicy(sizePolicy)
         self.pickElementButton.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
         self.pickElementButton.setToolButtonStyle(QtCore.Qt.ToolButtonTextOnly)
         self.pickElementButton.setObjectName("pickElementButton")

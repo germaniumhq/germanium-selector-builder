@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>608</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -81,6 +81,12 @@
         </item>
         <item>
          <widget class="QToolButton" name="pickElementButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>Pick</string>
           </property>
