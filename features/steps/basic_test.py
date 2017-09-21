@@ -25,7 +25,7 @@ def resolve_germanium_selector_in_js(context, source):
     loaded_code = read_file("js/main.js")
     js(loaded_code)
 
-    context.resolved_selector = js('return germaniumResolveElement(arguments[0])', element)
+    context.resolved_selector = js('return germaniumResolveElement([arguments[0]])', element)
 
 
 @step("I try to pick the element `(.*?)`")
