@@ -100,8 +100,10 @@ export function constructGermaniumSelector(element: Element, config?: IGermanium
     return selector;
 }
 
-export function removeXPathPrefix(value: string) : string {
-    const onlySelector = value.substring(value.indexOf(":") + 1)
+export function removeXPathPrefix(onlySelector: string) : string {
+    if (/^\w+:/.test(onlySelector)) {
+        onlySelector = onlySelector.substring(onlySelector.indexOf(":") + 1);
+    }
 
     if (/^\.\/\//.test(onlySelector)) {
         return onlySelector.substring(1)
@@ -110,8 +112,10 @@ export function removeXPathPrefix(value: string) : string {
     return onlySelector
 }
 
-export function removeXPathSearchPrefix(value: string) : string {
-    const onlySelector = value.substring(value.indexOf(":") + 1)
+export function removeXPathSearchPrefix(onlySelector: string) : string {
+    if (/^\w+:/.test(onlySelector)) {
+        onlySelector = onlySelector.substring(onlySelector.indexOf(":") + 1);
+    }
 
     if (/^\.\/\//.test(onlySelector)) {
         return onlySelector.substring(3)

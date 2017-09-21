@@ -4,27 +4,39 @@ import { constructGermaniumSelector, removeXPathPrefix } from './constructGerman
 import { xpathRelativize } from './xpathRelativize'
 
 export function convertToSelector(elements: Array<Element>) : string {
+    return selectorToSeleniumString(constructXPathSelector(elements));
+}
+
+/**
+ * Builds an XPath for the first element, taking the parents into
+ * account.
+ * 
+ * @param elements An array of elements to construct the XPath for. The
+ *                 first element is the target, and the rest are the
+ *                 references.
+ */
+function constructXPathSelector(elements: Array<Element>) : string {
     let result = constructGermaniumSelector(elements[0])
-
+    
     if (elements.length == 1) {
-        return selectorToSeleniumString(result);
+        return selectorToSeleniumString(result && result.getSelector());
     }
-
+    
     if (elements.length > 2) {
         return xpathRelativize(
-            convertToSelector(elements.slice(1)),
+            constructXPathSelector(elements.slice(1)),
             elementPathFromBody(elements[1]),
             constructGermaniumSelector(elements[0]).asXPath(),
             elementPathFromBody(elements[0]),
         );
     }
 
-    return "XPath(" + doubleQuotesText(xpathRelativize(
+    return xpathRelativize(
         constructGermaniumSelector(elements[1]).asXPath(),
         elementPathFromBody(elements[1]),
         constructGermaniumSelector(elements[0]).asXPath(),
         elementPathFromBody(elements[0]),
-    )) + ")";
+    );
 }
 
 function elementPathFromBody(element: Element) : Array<Element> {
@@ -39,12 +51,10 @@ function elementPathFromBody(element: Element) : Array<Element> {
 }
  
 
-function selectorToSeleniumString(selector: GeElement) : string {
-    if (!selector) {
+function selectorToSeleniumString(strSelector: string) : string {
+    if (!strSelector) {
         return "# unable to build selector";
     }
-
-    const strSelector = selector.getSelector()
 
     if (isXPath(strSelector)) {
         return `XPath(${doubleQuotesText(removeXPathPrefix(strSelector))})`
@@ -55,7 +65,7 @@ function selectorToSeleniumString(selector: GeElement) : string {
 }
 
 function isXPath(strSelector: string) {
-    return /^xpath:/.test(strSelector)
+    return /^xpath:/.test(strSelector) || /^\/\//.test(strSelector)
 }
 
 function doubleQuotesText(value: string) {

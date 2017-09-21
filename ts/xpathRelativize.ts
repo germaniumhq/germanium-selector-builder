@@ -15,6 +15,8 @@ export function xpathRelativize(parentReferenceXPath: string,
                                 parentAbsoluteXPath: Array<Element>,
                                 targetNodeXPath: string,
                                 targetAbsoluteXPath: Array<Element>) : string {
+    console.log(`Relativize`, parentReferenceXPath, targetNodeXPath)
+
     let commonParent = parentAbsoluteXPath[0]
     let index = 0
 

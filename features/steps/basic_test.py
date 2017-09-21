@@ -51,12 +51,29 @@ def pick_two_elements(context, element_count, source):
 
     js('window["__germaniumDebugMode"] = true;')
     js(loaded_code)
-    js('germaniumPickElement(2)')
+    js('germaniumPickElement(%s)' % element_count)
 
     click(eval(source, globals(), dict()))
 
 
 @step("using a reference of: `(.*?)`")
+def pick_second_element(context, source):
+    click(eval(source, globals(), dict()))
+    context.resolved_selector = js('return germaniumGetPickedElement()')
+
+    assertEqual(js('return pickState.state;'), 'READY')
+    assertEqual(js('return mouseState.state;'), 'NOT_PRESSED')
+
+
+@step("using a first reference of: `(.*?)`")
+def pick_second_element(context, source):
+    click(eval(source, globals(), dict()))
+
+    assertEqual(js('return pickState.state;'), 'PICKING')
+    assertEqual(js('return mouseState.state;'), 'PICKING')
+
+
+@step("using a second reference of: `(.*?)`")
 def pick_second_element(context, source):
     click(eval(source, globals(), dict()))
     context.resolved_selector = js('return germaniumGetPickedElement()')

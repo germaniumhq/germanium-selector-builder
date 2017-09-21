@@ -26,6 +26,17 @@ Scenario: Picking two elements that are far to each other
   Then I get the element: `InputText()`
 
 
+Scenario: Picking three elements with the mouse should
+          work correctly.
+  Given I open the browser on the saved google page
+  When I try to pick 3 elements: `InputText()`
+  And using a first reference of: `Element('span').right_of(InputText())`
+  And using a second reference of: `Text("Österreich")`
+  Then I get the xpath selector: u"//div[string()='Österreich'][contains(concat(' ', @class, ' '), ' logo-subtext ')]/ancestor::div[contains(concat(' ', @class, ' '), ' ctr-p ')]//span[contains(concat(' ', @class, ' '), ' gsri_a ')]/../../..//input[@name='q']"
+  When I try to find the returned xpath selector
+  Then I get the element: `InputText()`
+
+
 Scenario: Picking and cancelling should work correctly.
   Given I open the browser on the saved google page
   When I start picking elements
