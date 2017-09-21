@@ -12,18 +12,18 @@ export function convertToSelector(elements: Array<Element>) : string {
 
     if (elements.length > 2) {
         return xpathRelativize(
+            convertToSelector(elements.slice(1)),
+            elementPathFromBody(elements[1]),
             constructGermaniumSelector(elements[0]).asXPath(),
             elementPathFromBody(elements[0]),
-            convertToSelector(elements.slice(1)),
-            elementPathFromBody(elements[1])
         );
     }
 
     return "XPath(" + doubleQuotesText(xpathRelativize(
+        constructGermaniumSelector(elements[1]).asXPath(),
+        elementPathFromBody(elements[1]),
         constructGermaniumSelector(elements[0]).asXPath(),
         elementPathFromBody(elements[0]),
-        constructGermaniumSelector(elements[1]).asXPath(),
-        elementPathFromBody(elements[1])
     )) + ")";
 }
 

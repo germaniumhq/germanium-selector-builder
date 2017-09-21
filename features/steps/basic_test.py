@@ -64,6 +64,7 @@ def pick_second_element(context, source):
     assertEqual(js('return pickState.state;'), 'READY')
     assertEqual(js('return mouseState.state;'), 'NOT_PRESSED')
 
+
 @step('I start picking elements')
 def start_picking_the_element(context):
     # we inject first the code.
@@ -88,6 +89,17 @@ def is_the_correct_state(context):
 @step("I get the xpath selector: (u?\".*?\")")
 def validate_xpath_selector(context, expected_selector):
     assertEqual('XPath(' + expected_selector + ')', context.resolved_selector)
+
+
+@step("I try to find the returned xpath selector")
+def get_the_element_using_the_resolved_selector(context):
+    context.found_element = eval(context.resolved_selector, globals(), locals()).element()
+
+
+@step("I get the element: `(.*?)`")
+def then_i_get_the_element(context, selector):
+    reference_element = eval(selector, globals(), locals()).element()
+    assertEqual(reference_element, context.found_element)
 
 
 def read_file(path):

@@ -1,11 +1,17 @@
 import { GeElement } from './Element'
 import { elementList } from './Locator'
+
+export interface IGermaniumSelectorConfig {
+    excludeTextSearch?: boolean
+}
+
 /**
  * Consturct a Germanium selector for the given element.
  * @param element The HTML Element to build the selector for
  */
-export function constructGermaniumSelector(element: Element) : GeElement {
+export function constructGermaniumSelector(element: Element, config?: IGermaniumSelectorConfig) : GeElement {
     const attributes : { [name: string] : string } = getAttributes(element);
+    config = config ? config : {}
     
     const selector = new GeElement(element.tagName)
 
@@ -36,7 +42,7 @@ export function constructGermaniumSelector(element: Element) : GeElement {
 
     // if multiline it shold have a lower priority. multiple spaces means
     // that probably there are multiple elements contained.
-    if (text && !/[\n\r]/.test(text) && !/  /.test(text)) {
+    if (text && !/[\n\r]/.test(text) && !/  /.test(text) && !config.excludeTextSearch) {
         selector.exactText = text
 
         if (isUnique(selector)) {
@@ -83,7 +89,7 @@ export function constructGermaniumSelector(element: Element) : GeElement {
     }
 
     // if multiline it shold have a lower priority
-    if (text && !selector.exactText) {
+    if (text && !selector.exactText && !config.excludeTextSearch) {
         selector.exactText = text
 
         if (isUnique(selector)) {
@@ -99,6 +105,16 @@ export function removeXPathPrefix(value: string) : string {
 
     if (/^\.\/\//.test(onlySelector)) {
         return onlySelector.substring(1)
+    }
+
+    return onlySelector
+}
+
+export function removeXPathSearchPrefix(value: string) : string {
+    const onlySelector = value.substring(value.indexOf(":") + 1)
+
+    if (/^\.\/\//.test(onlySelector)) {
+        return onlySelector.substring(3)
     }
 
     return onlySelector

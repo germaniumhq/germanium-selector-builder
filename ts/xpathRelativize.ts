@@ -1,4 +1,8 @@
-import { constructGermaniumSelector, removeXPathPrefix } from './constructGermaniumSelector';
+import { 
+    constructGermaniumSelector,
+    removeXPathPrefix,
+    removeXPathSearchPrefix,
+} from './constructGermaniumSelector';
 
 /**
  * Computes a path from the parent to the target node.
@@ -28,8 +32,16 @@ export function xpathRelativize(parentReferenceXPath: string,
     // if we have more than 3 levels of exiting, we build a selector for the
     // common parent.
     if (parentAbsoluteXPath.length - index > 3) {
-        return parentReferenceXPath + "/ancestor::" + constructGermaniumSelector(commonParent) + targetNodeXPath
+        return removeXPathPrefix(parentReferenceXPath) + 
+                 "/ancestor::" + 
+                 removeXPathSearchPrefix(constructGermaniumSelector(commonParent, { excludeTextSearch: true }).asXPath()) + 
+                 removeXPathPrefix(targetNodeXPath)
     }
 
-    return parentReferenceXPath + "/.." + removeXPathPrefix(targetNodeXPath)
+    let prefix = ""
+    for (let i = 0; i < parentAbsoluteXPath.length - index; i++) {
+        prefix += '/..'
+    } 
+
+    return removeXPathPrefix(parentReferenceXPath) + prefix + removeXPathPrefix(targetNodeXPath)
 }
