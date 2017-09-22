@@ -1,8 +1,7 @@
 from PySide import QtGui
 from io import StringIO
 
-from PySide.QtGui import QSyntaxHighlighter
-from PySide.QtGui import QTextCharFormat
+from PySide.QtGui import QTextCharFormat, QSyntaxHighlighter, QFont
 import keyword
 import germanium.selectors
 
@@ -22,19 +21,21 @@ class PythonHighlighter(QSyntaxHighlighter):
 
         self.keyword_format = QTextCharFormat()
         self.keyword_format.setForeground(QtGui.QBrush(QtGui.QColor("#804515")))
+        self.keyword_format.setFontWeight(QFont.Bold)
 
         self.string_format = QTextCharFormat()
         self.string_format.setForeground(QtGui.QBrush(QtGui.QColor("#116611")))
 
         self.operator_format = QTextCharFormat()
         self.operator_format.setForeground(QtGui.QBrush(QtGui.QColor("#003333")))
+        self.operator_format.setFontWeight(QFont.Bold)
 
         self.comment_format = QTextCharFormat()
         self.comment_format.setForeground(QtGui.QBrush(QtGui.QColor("#888888")))
 
         self.selector_format = QTextCharFormat()
         self.selector_format.setForeground(QtGui.QBrush(QtGui.QColor("#003333")))
-        self.selector_format.setFontWeight(75)
+        self.selector_format.setFontWeight(QFont.Bold)
 
     def highlightBlock(self, text, *args, **kwargs):
         tokens = tokenize.generate_tokens(StringIO(text).readline)
