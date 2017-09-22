@@ -63,34 +63,34 @@ export class GeElement implements IElementConfig {
     asXPath() : string {
         let xpathLocator = `.//${this.tagName}`
         
-                if (this.containsText) {
-                    xpathLocator += `[contains(normalize-space(string()), '${this.containsText}')]`
-                }
-        
-                if (this.exactText) {
-                    xpathLocator += `[string()='${this.exactText}']`
-                }
-        
-                for (let i = 0; i < this.cssClasses.length; i++) {
-                    let cssClass = this.cssClasses[i]
-                    xpathLocator += `[contains(concat(' ', @class, ' '), ' ${cssClass} ')]`
-                }
-        
-                for (let k in this.exactAttributes) {
-                    xpathLocator += `[@${k}='${this.exactAttributes[k]}']`
-                }
-        
-                for (let k in this.containsAttributes) {
-                    xpathLocator += `[contains(normalize-space(@${k}), '${this.containsAttributes[k]}')]`
-                }
-        
-                if (this.extraXPath) {
-                    xpathLocator += this.extraXPath
-                }
-        
-                if (this.index) {
-                    xpathLocator = `(${xpathLocator})[${this.index}]`
-                }
+        if (this.containsText) {
+            xpathLocator += `[contains(normalize-space(string()), '${this.containsText}')]`
+        }
+
+        if (this.exactText) {
+            xpathLocator += `[string()='${this.exactText}']`
+        }
+
+        for (let i = 0; i < this.cssClasses.length; i++) {
+            let cssClass = this.cssClasses[i]
+            xpathLocator += `[contains(concat(' ', @class, ' '), ' ${cssClass} ')]`
+        }
+
+        for (let k in this.exactAttributes) {
+            xpathLocator += `[@${k}='${this.exactAttributes[k]}']`
+        }
+
+        for (let k in this.containsAttributes) {
+            xpathLocator += `[contains(normalize-space(@${k}), '${this.containsAttributes[k]}')]`
+        }
+
+        if (this.extraXPath) {
+            xpathLocator += this.extraXPath
+        }
+
+        if (this.index) {
+            xpathLocator = `(${xpathLocator})[${this.index}]`
+        }
 
         return xpathLocator;
     }

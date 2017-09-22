@@ -4,6 +4,10 @@ import { constructGermaniumSelector, removeXPathPrefix } from './constructGerman
 import { xpathRelativize } from './xpathRelativize'
 
 export function convertToSelector(elements: Array<Element>) : string {
+    if (elements.length == 1) {
+        return selectorToSeleniumString( constructGermaniumSelector(elements[0]).getSelector());    
+    }
+
     return selectorToSeleniumString(constructXPathSelector(elements));
 }
 
@@ -19,7 +23,7 @@ function constructXPathSelector(elements: Array<Element>) : string {
     let result = constructGermaniumSelector(elements[0])
     
     if (elements.length == 1) {
-        return selectorToSeleniumString(result && result.getSelector());
+        return result && result.asXPath();
     }
     
     if (elements.length > 2) {
@@ -54,6 +58,10 @@ function elementPathFromBody(element: Element) : Array<Element> {
 function selectorToSeleniumString(strSelector: string) : string {
     if (!strSelector) {
         return "# unable to build selector";
+    }
+
+    if (/^\w+\(/.test(strSelector)) {
+        return strSelector;
     }
 
     if (isXPath(strSelector)) {
