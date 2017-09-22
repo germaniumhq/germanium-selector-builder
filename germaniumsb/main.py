@@ -8,6 +8,7 @@ import traceback
 import os
 
 from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
+from germaniumsb.PythonHighlighter import PythonHighlighter
 from germaniumsb.code_editor import extract_code, insert_code_into_editor
 from germaniumsb.inject_code import inject_into_current_document, is_germaniumsb_injected, \
     start_picking_into_current_document, stop_picking_into_current_document, run_in_all_iframes
@@ -67,6 +68,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self._setup_buttons_visibilities()
         self._show_application_status()
+
+        PythonHighlighter(self.codeEdit.document())
 
         #=====================================================
         # logic states.
