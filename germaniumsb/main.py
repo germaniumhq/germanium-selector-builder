@@ -251,6 +251,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.after_leave(BrowserState.PAUSED, live_leave_state)
         self._browser.after_leave(BrowserState.GENERATING_SELECTOR, live_leave_state)
 
+    def _update_elements_to_find_label(self, count):
+        self.pick_element_count_label.setText("%s element(s) to find" % str(count))
+
     def start_browser(self):
         try:
             open_browser(BROWSERS[self.browserCombo.currentIndex()])
@@ -274,7 +277,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def inject_code(self):
         try:
-            _, error_happened, error_messages = inject_into_current_document()
+            _, _, error_happened, error_messages = inject_into_current_document()
 
             if error_happened:
                 self._browser.error_injecting_code(error_messages)
@@ -286,7 +289,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
 
     def start_picking_element(self, count):
-        _, error_happened, error_messages = start_picking_into_current_document(count)
+        _, _, error_happened, error_messages = start_picking_into_current_document(count)
 
         if error_happened:
             self._browser.error_injecting_code(error_messages)
@@ -300,7 +303,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         ev.target_state == BrowserState.GENERATING_SELECTOR:
             return
 
-        _, error_happened, error_messages = stop_picking_into_current_document()
+        _, _, error_happened, error_messages = stop_picking_into_current_document()
 
         if error_happened:
             self._browser.error(error_messages)
@@ -336,12 +339,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self._browser.inject_code()
                 return
 
-            element, error_happened, error_messages = get_picked_element()
+            data, \
+                found_result, \
+                error_happened, \
+                error_messages = get_picked_element()
 
-            if not element:
+            self._update_elements_to_find_label(data["pickCount"])
+
+            if not found_result:
                 return
 
-            self._browser.generate_selector(element)
+            self._browser.generate_selector(data["foundSelector"])
         except Exception as e:
             self._browser.error(e)
 
@@ -379,7 +387,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 highlight(selector)
                 return len(elements)
 
-        found_elements, error_happened, error_messages = \
+        found_elements, _, error_happened, error_messages = \
             run_in_all_iframes(highlight_selector)
 
         if found_elements is not None:

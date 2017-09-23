@@ -2,6 +2,11 @@ import { convertToSelector } from './convertToSelector'
 import { PickState, PickStateMachine } from './PickStateMachine'
 import { MouseState, MouseStateMachine } from './MouseStateMachine'
 
+export interface IPickElementResult {
+    pickCount: number,
+    foundSelector: string,
+}
+
 (function() {
 
 const pickState = new PickStateMachine()
@@ -114,16 +119,22 @@ document.addEventListener("keyup", function(ev) {
  * If we have an element, we return it, and stop the picking.
  * 
  */
-function germaniumGetPickedElement() {
+function germaniumGetPickedElement() : IPickElementResult {
     if (!pickState.foundSelector) {
-        return null
+        return {
+            foundSelector: null,
+            pickCount: pickState.pickCount,
+        }
     }
 
     // if we cannot switch to ready, we wait first for the
     // events to be processed, and only then we return the
     // selector
     if (pickState.ready() != PickState.READY) {
-        return null
+        return {
+            foundSelector: null,
+            pickCount: pickState.pickCount,
+        }
     }
 
     mouseState.stopPicking();
@@ -131,7 +142,10 @@ function germaniumGetPickedElement() {
     const result = pickState.foundSelector
     pickState.foundSelector = null
     
-    return result
+    return {
+        foundSelector: result,
+        pickCount: pickState.pickCount
+    }
 }
 
 // export global functions on the window object that will be used

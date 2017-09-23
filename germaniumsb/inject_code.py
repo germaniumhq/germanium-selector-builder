@@ -40,23 +40,36 @@ def is_germaniumsb_injected():
     return js('return window["__germanium_loaded"];')
 
 
-def run_in_all_iframes(code, error_messages=None, checked_frames=None):
+def run_in_all_iframes(code, result_evaluator=None):
     get_germanium().switch_to.default_content()
-    return _run_in_all_iframes_internal(code, error_messages, checked_frames)
+
+    def default_result_evaluator(result):
+        return result, result
+
+    if not result_evaluator:
+        result_evaluator = default_result_evaluator
+
+    return _run_in_all_iframes_internal(code, result_evaluator)
 
 
-def _run_in_all_iframes_internal(code, error_messages=None, checked_frames=None):
+def _run_in_all_iframes_internal(code,
+                                 result_evaluator,
+                                 error_messages=None,
+                                 checked_frames=None):
     error_happened = False
     error_messages = error_messages if error_messages is not None else []
     checked_frames = checked_frames if checked_frames is not None else set()
 
     result = None
+    result_found = False
 
     try:
         result = code()
 
-        if result is not None:
-            return result, error_happened, error_messages
+        result, result_found = result_evaluator(result)
+
+        if result_found:
+            return result, result_found, error_happened, error_messages
     except Exception as e:
         print(e)
         error_messages.append(str(e))
@@ -75,12 +88,21 @@ def _run_in_all_iframes_internal(code, error_messages=None, checked_frames=None)
             # switcharoeed
             continue
 
-        iframe_result, iframe_error_happened, iframe_error_messages = \
-            _run_in_all_iframes_internal(code, error_messages, checked_frames)
+        iframe_result, \
+        iframe_result_found, \
+        iframe_error_happened, \
+        iframe_error_messages = \
+            _run_in_all_iframes_internal(code,
+                                         result_evaluator,
+                                         error_messages,
+                                         checked_frames)
 
         error_happened |= iframe_error_happened
 
-        if iframe_result is not None and result is None:
-            return iframe_result, error_happened, error_messages
+        if iframe_result_found and not result_found:
+            return iframe_result, \
+                   iframe_result_found, \
+                   error_happened, \
+                   error_messages
 
-    return result, error_happened, error_messages
+    return result, result_found, error_happened, error_messages
