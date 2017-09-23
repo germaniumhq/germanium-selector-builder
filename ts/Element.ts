@@ -48,7 +48,7 @@ export class GeElement implements IElementConfig {
             this.cssClasses = config.cssClasses ? config.cssClasses.slice() : []
             this.exactAttributes = config.exactAttributes ? cloneAttributes(config.exactAttributes) : {}
             this.containsAttributes = config.containsAttributes ? cloneAttributes(config.containsAttributes) : {}
-            this.extraXPath == config.extraXPath
+            this.extraXPath = config.extraXPath
         }
     }
 
