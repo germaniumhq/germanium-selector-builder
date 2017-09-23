@@ -22,4 +22,3 @@ properties:
   foundSelector: string
   selectedElements: Array<Element>
   pickCount: number
-

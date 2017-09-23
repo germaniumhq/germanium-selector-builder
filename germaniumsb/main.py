@@ -10,8 +10,12 @@ import os
 from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
 from germaniumsb.PythonHighlighter import PythonHighlighter
 from germaniumsb.code_editor import extract_code, insert_code_into_editor
-from germaniumsb.inject_code import inject_into_current_document, is_germaniumsb_injected, \
-    start_picking_into_current_document, stop_picking_into_current_document, run_in_all_iframes
+from germaniumsb.inject_code import \
+    inject_into_current_document, \
+    is_germaniumsb_injected, \
+    start_picking_into_current_document, \
+    stop_picking_into_current_document, \
+    run_in_all_iframes
 
 from germaniumsb.pick_element import get_picked_element
 
@@ -51,7 +55,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # This is more or less the rest of the setupUi
         self.status_label = QLabel()
         self.found_element_count_label = QLabel("Found: 0")
-        self.pick_element_count_label = QLabel("Not Picking")
+        self.pick_element_count_label = QLabel("Not picking elements")
 
         for browser in BROWSERS:
             self.browserCombo.addItem(browser)
@@ -100,20 +104,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         pickElementMenu = QMenu(self.pickElementButton)
         pick_2_action = QAction("+1 reference", pickElementMenu)
-        pick_2_action.activated.connect(lambda: self.start_picking_element(2))
+        pick_2_action.activated.connect(lambda: self._browser.pick(2))
         pickElementMenu.addAction(pick_2_action)
         pick_3_action = QAction("+2 references", pickElementMenu)
-        pick_3_action.activated.connect(lambda: self.start_picking_element(3))
+        pick_3_action.activated.connect(lambda: self._browser.pick(3))
         pickElementMenu.addAction(pick_3_action)
         pick_4_action = QAction("+3 references", pickElementMenu)
-        pick_4_action.activated.connect(lambda: self.start_picking_element(4))
+        pick_4_action.activated.connect(lambda: self._browser.pick(4))
         pickElementMenu.addAction(pick_4_action)
         pick_5_action = QAction("+4 references", pickElementMenu)
-        pick_5_action.activated.connect(lambda: self.start_picking_element(5))
+        pick_5_action.activated.connect(lambda: self._browser.pick(5))
         pickElementMenu.addAction(pick_5_action)
-        self.pickElementButton.setMenu(pickElementMenu)
 
-        self.pickElementButton.clicked.connect(_(self._browser.pick))
+        self.pickElementButton.setMenu(pickElementMenu)
+        self.pickElementButton.clicked.connect(lambda: self._browser.pick(1))
+
         self.actionPick.activated.connect(_(self._browser.pick))
         self.actionPick.setShortcut("Ctrl+K")
 
@@ -134,7 +139,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.before_leave(BrowserState.STOPPED, _(self.start_browser))
         self._browser.after_enter(BrowserState.STARTED, _(self._browser.inject_code))
         self._browser.after_enter(BrowserState.INJECTING_CODE, _(self.inject_code))
-        self._browser.after_enter(BrowserState.PICKING, lambda ev: self.start_picking_element(1))
+        self._browser.after_enter(BrowserState.PICKING, lambda ev: self.start_picking_element(ev.data))
         self._browser.after_enter(BrowserState.BROWSER_NOT_STARTED, _(self.browser_not_available))
         self._browser.after_enter(BrowserState.BROWSER_NOT_READY, _(self.browser_not_available))
         self._browser.after_enter(BrowserState.INJECTING_CODE_FAILED, self.injecting_code_failed)
@@ -154,6 +159,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self._browser.before_leave(BrowserState.PICKING, self.stop_picking_element)
         self._browser.before_leave(BrowserState.GENERATING_SELECTOR, self.stop_picking_element)
+
+        self._browser.after_leave(BrowserState.PICKING, _(lambda: self._update_elements_to_find_label(-1)))
 
     def on_focus_changed(self, old_widget, new_widget):
         """
@@ -252,7 +259,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.after_leave(BrowserState.GENERATING_SELECTOR, live_leave_state)
 
     def _update_elements_to_find_label(self, count):
-        self.pick_element_count_label.setText("%s element(s) to find" % str(count))
+        if self._browser.state != BrowserState.PICKING:
+            self.pick_element_count_label.setText("Not picking elements")
+        elif count == 1:
+            self.pick_element_count_label.setText("%s element to pick" % str(count))
+        else:
+            self.pick_element_count_label.setText("%s elements to pick" % str(count))
 
     def start_browser(self):
         try:
@@ -296,11 +308,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
 
     def stop_picking_element(self, ev):
-        # in case we're generating the selector, we need to keep the
+        #
+        # In case we're generating the selector, we need to keep the
         # iframe correct, so we're not switching until the selector
         # is computed.
-        if ev.start_state == BrowserState.PICKING and \
-                        ev.target_state == BrowserState.GENERATING_SELECTOR:
+        #
+        # For this we have this method registered on before_leave for
+        # both exiting PICKING and exiting GENERATING_SELECTOR states.
+        #
+        if ev.target_state == BrowserState.GENERATING_SELECTOR:
             return
 
         _, _, error_happened, error_messages = stop_picking_into_current_document()
@@ -398,7 +414,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                  self.tr("No Element Found"),
                                  "No element was found for the given selector.",
                                  QMessageBox.Close)
-
 
     def on_error(self, ev):
         error_message = QMessageBox()

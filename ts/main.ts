@@ -24,13 +24,12 @@ function halt(ev: Event) {
 
 // we need to specify how many items we're going to pick.
 pickState.afterEnter(PickState.PICKING, function(ev) {
-    console.log(ev, arguments)
     pickState.pickCount = ev.data.count
+    console.log(`new count is ${pickState.pickCount}`)
     pickState.selectedElements = []
 });
 
 pickState.onData(PickState.PICKING, 'mouse_down', (ev) => {
-    console.log('pick' + ev.data.target);
     pickState.pickCount--;
     pickState.selectedElements.push(ev.data.target)
 
@@ -75,11 +74,13 @@ function mouseClickEventHandler(ev) {
 }
 
 function germaniumPickElement(elementCount: number) {
+    console.log("start picking");
     pickState.startPicking({count: elementCount});
     mouseState.startPicking();
 }
 
 function germaniumStopPickingElement() {
+    console.log("cancel picking");
     pickState.cancelPick();
     mouseState.stopPicking();
 }
