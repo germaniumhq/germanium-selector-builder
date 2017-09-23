@@ -162,5 +162,11 @@ function getAttributes(e: Element) : { [name: string ] : string } {
 }
 
 function getText(e: Element) : string {
-    return e.textContent
+    const actualText = e.textContent
+
+    if (/^[\n\r\t\s]*$/.test(actualText)) {
+        return '';
+    }
+
+    return actualText
 }
