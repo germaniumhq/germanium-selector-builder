@@ -43,67 +43,52 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pick_timer = QTimer(self)
 
         self._browser = BrowserStateMachine()
-        self.status_label = QLabel()
-
-        self.found_element_count_label = QLabel("Found: 0")
 
         self.setupUi(self)
-        self.assign_widgets()
-        self.show()
 
-        self._browser.application_initialized()
-
-    def assign_widgets(self):
-        icon = QtGui.QIcon()
-        icon_path = os.path.join(base_dir("germaniumsb"), "favicon.ico")
-
-        icon.addPixmap(QtGui.QPixmap(icon_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.setWindowIcon(icon)
+        # setupUi defined in __init__
+        # --------------------------------------------------------
+        # This is more or less the rest of the setupUi
+        self.status_label = QLabel()
+        self.found_element_count_label = QLabel("Found: 0")
+        self.pick_element_count_label = QLabel("Not Picking")
 
         for browser in BROWSERS:
             self.browserCombo.addItem(browser)
 
         self.statusbar.addWidget(self.status_label)
         self.statusbar.addWidget(self.found_element_count_label)
-
-        self._setup_buttons_visibilities()
-        self._show_application_status()
+        self.statusbar.addWidget(self.pick_element_count_label)
 
         PythonHighlighter(self.codeEdit.document())
+        # end of setupUi defined in __init__
+        # --------------------------------------------------------
 
-        #=====================================================
-        # logic states.
-        #=====================================================
+        self.set_window_icon()
+        self.assign_widgets()
+        self.show()
 
-        # actual actions mapped on the transitions
-        self._browser.before_enter(BrowserState.STOPPED, _(self.stop_browser))
-        self._browser.before_leave(BrowserState.STOPPED, _(self.start_browser))
-        self._browser.after_enter(BrowserState.STARTED, _(self._browser.inject_code))
-        self._browser.after_enter(BrowserState.INJECTING_CODE, _(self.inject_code))
-        self._browser.after_enter(BrowserState.PICKING, lambda ev: self.start_picking_element(1))
-        self._browser.after_enter(BrowserState.BROWSER_NOT_STARTED, _(self.browser_not_available))
-        self._browser.after_enter(BrowserState.BROWSER_NOT_READY, _(self.browser_not_available))
-        self._browser.after_enter(BrowserState.INJECTING_CODE_FAILED, self.injecting_code_failed)
+        self._browser.application_initialized()
 
-        self._browser.after_enter(BrowserState.GENERATING_SELECTOR, self.generate_selector)
+    def set_window_icon(self):
+        icon = QtGui.QIcon()
+        icon_path = os.path.join(base_dir("germaniumsb"), "favicon.ico")
 
-        self._browser.after_enter(BrowserState.ERROR, self.on_error)
+        icon.addPixmap(QtGui.QPixmap(icon_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(icon)
 
-        def timer_leave_state(ev):
-            if ev.target_state != BrowserState.READY and \
-               ev.target_state != BrowserState.PICKING:
-                self.pick_timer.stop()
+    def assign_widgets(self):
+        self._setup_buttons_visibilities()
+        self._show_application_status()
+        self._setup_state_change_listeners()
+        self._setup_user_events_listeners()
 
-        self._browser.after_enter(BrowserState.READY, _(lambda: self.pick_timer.start(2000)))
-        self._browser.before_leave(BrowserState.READY, timer_leave_state)
-        self._browser.before_leave(BrowserState.PICKING, timer_leave_state)
-
-        self._browser.before_leave(BrowserState.PICKING, self.stop_picking_element)
-        self._browser.before_leave(BrowserState.GENERATING_SELECTOR, self.stop_picking_element)
-
-        #=====================================================
-        # listen for events
-        #=====================================================
+    def _setup_user_events_listeners(self):
+        """
+        Wires the user events to methods. This includes the actions
+        that are defined.
+        :return:
+        """
         self.startBrowserButton.clicked.connect(_(self._browser.start_browser))
 
         self.stopBrowserButton.clicked.connect(_(self._browser.close_browser))
@@ -120,6 +105,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         pick_3_action = QAction("+2 references", pickElementMenu)
         pick_3_action.activated.connect(lambda: self.start_picking_element(3))
         pickElementMenu.addAction(pick_3_action)
+        pick_4_action = QAction("+3 references", pickElementMenu)
+        pick_4_action.activated.connect(lambda: self.start_picking_element(4))
+        pickElementMenu.addAction(pick_4_action)
+        pick_5_action = QAction("+4 references", pickElementMenu)
+        pick_5_action.activated.connect(lambda: self.start_picking_element(5))
+        pickElementMenu.addAction(pick_5_action)
         self.pickElementButton.setMenu(pickElementMenu)
 
         self.pickElementButton.clicked.connect(_(self._browser.pick))
@@ -133,7 +124,45 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.pick_timer.timeout.connect(_(self.on_pick_timer))
 
+    def _setup_state_change_listeners(self):
+        """
+         This setups the actions on transitions in the state
+         machine. For example injecting code, or trying to
+         fetch the generated selector.
+        """
+        self._browser.before_enter(BrowserState.STOPPED, _(self.stop_browser))
+        self._browser.before_leave(BrowserState.STOPPED, _(self.start_browser))
+        self._browser.after_enter(BrowserState.STARTED, _(self._browser.inject_code))
+        self._browser.after_enter(BrowserState.INJECTING_CODE, _(self.inject_code))
+        self._browser.after_enter(BrowserState.PICKING, lambda ev: self.start_picking_element(1))
+        self._browser.after_enter(BrowserState.BROWSER_NOT_STARTED, _(self.browser_not_available))
+        self._browser.after_enter(BrowserState.BROWSER_NOT_READY, _(self.browser_not_available))
+        self._browser.after_enter(BrowserState.INJECTING_CODE_FAILED, self.injecting_code_failed)
+
+        self._browser.after_enter(BrowserState.GENERATING_SELECTOR, self.generate_selector)
+
+        self._browser.after_enter(BrowserState.ERROR, self.on_error)
+
+        def timer_leave_state(ev):
+            if ev.target_state != BrowserState.READY and \
+                            ev.target_state != BrowserState.PICKING:
+                self.pick_timer.stop()
+
+        self._browser.after_enter(BrowserState.READY, _(lambda: self.pick_timer.start(2000)))
+        self._browser.before_leave(BrowserState.READY, timer_leave_state)
+        self._browser.before_leave(BrowserState.PICKING, timer_leave_state)
+
+        self._browser.before_leave(BrowserState.PICKING, self.stop_picking_element)
+        self._browser.before_leave(BrowserState.GENERATING_SELECTOR, self.stop_picking_element)
+
     def on_focus_changed(self, old_widget, new_widget):
+        """
+        Method called from QT whenever the focus changes inside
+        the application.
+        :param old_widget:
+        :param new_widget:
+        :return:
+        """
         if old_widget == self.codeEdit:
             return
 
@@ -141,6 +170,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
 
     def _show_application_status(self):
+        """
+        Wire the status label on state changes to show the
+        state of the application.
+        :return:
+        """
         self._browser.before_enter(BrowserState.STOPPED,
                                    lambda ev: self.status_label.setText("Status: Browser stopped"))
         self._browser.before_enter(BrowserState.STARTED,
@@ -159,6 +193,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                    lambda ev: self.status_label.setText("Status: Error :( ..."))
 
     def _setup_buttons_visibilities(self):
+        """
+        Changes the buttons visibilities and/or disables actions
+        depending on the actions availabilities starting from
+        the state machine.
+        :return:
+        """
         self.startBrowserButton.show()
         self.stopBrowserButton.hide()
         self.pickElementButton.hide()
