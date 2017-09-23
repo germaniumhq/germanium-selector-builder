@@ -30,6 +30,11 @@ export function xpathRelativize(parentReferenceXPath: string,
         index++
     }
 
+    // if the targetNode is actually the parentNode, we return the parent XPath.
+    if (index == parentAbsoluteXPath.length) {
+        return parentReferenceXPath;
+    }
+
     // we exit from the reference node until the common parent.
     // if we have more than 3 levels of exiting, we build a selector for the
     // common parent.

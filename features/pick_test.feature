@@ -42,3 +42,9 @@ Scenario: Picking and cancelling should work correctly.
   When I start picking elements
   And I cancel picking elements
   Then the state of the browser is correct and accepting commands
+
+Scenario: Picking the same element twice, should return the single element once.
+  Given I open the browser on the saved google page
+  When I try to pick 2 elements: `InputText()`
+  And using a reference of: `InputText()`
+  Then I get the xpath selector: "//input[@name='q']"

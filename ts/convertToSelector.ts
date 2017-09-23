@@ -1,11 +1,15 @@
 
 import { GeElement } from './Element'
-import { constructGermaniumSelector, removeXPathPrefix } from './constructGermaniumSelector'
+import { 
+    constructGermaniumSelector,
+    removeXPathPrefix,
+    removeCssPrefix,
+} from './constructGermaniumSelector'
 import { xpathRelativize } from './xpathRelativize'
 
 export function convertToSelector(elements: Array<Element>) : string {
     if (elements.length == 1) {
-        return selectorToSeleniumString( constructGermaniumSelector(elements[0]).getSelector());    
+        return selectorToSeleniumString(constructGermaniumSelector(elements[0]).getSelector());    
     }
 
     return selectorToSeleniumString(constructXPathSelector(elements));
@@ -68,12 +72,12 @@ function selectorToSeleniumString(strSelector: string) : string {
         return `XPath(${doubleQuotesText(removeXPathPrefix(strSelector))})`
     }
 
-    return `Css(${doubleQuotesText(removeXPathPrefix(strSelector))})`
+    return `Css(${doubleQuotesText(removeCssPrefix(strSelector))})`
     
 }
 
 function isXPath(strSelector: string) {
-    return /^xpath:/.test(strSelector) || /^\/\//.test(strSelector)
+    return /^xpath:/.test(strSelector) || /^\.?\/\//.test(strSelector)
 }
 
 function doubleQuotesText(value: string) {

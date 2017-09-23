@@ -112,6 +112,14 @@ export function removeXPathPrefix(onlySelector: string) : string {
     return onlySelector
 }
 
+export function removeCssPrefix(onlySelector: string) : string {
+    if (/^\w+:/.test(onlySelector)) {
+        onlySelector = onlySelector.substring(onlySelector.indexOf(":") + 1);
+    }
+
+    return onlySelector    
+}
+
 export function removeXPathSearchPrefix(onlySelector: string) : string {
     if (/^\w+:/.test(onlySelector)) {
         onlySelector = onlySelector.substring(onlySelector.indexOf(":") + 1);
