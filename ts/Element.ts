@@ -57,7 +57,40 @@ export class GeElement implements IElementConfig {
     }
 
     getSelector() : string {
-        return `xpath:${this.asXPath()}`
+        if (this.isXPathSelector()) {
+            return `xpath:${this.asXPath()}`;
+        }
+
+        return `css:${this.asCss()}`;
+    }
+
+    private isXPathSelector() : boolean {
+        return (this.index || this.containsText || this.exactText || this.extraXPath) && true;
+    }
+
+    asCss() : string {
+        let cssLocator = `${this.tagName}`
+        let matchId;
+
+        if (this.exactAttributes["id"]) {
+            cssLocator += `#${this.exactAttributes["id"]}`;
+            delete this.exactAttributes["id"];
+        }
+
+        for (let k in this.exactAttributes) {
+            cssLocator += `[${k}='${this.exactAttributes[k]}']`;
+        }
+
+        for (let k in this.containsAttributes) {
+            cssLocator += `[${k}~='${this.containsAttributes[k]}']`;
+        }
+
+        for (let i = 0; i < this.cssClasses.length; i++) {
+            let cssClass = this.cssClasses[i];
+            cssLocator += `.${cssClass}`;
+        }
+
+        return cssLocator
     }
 
     asXPath() : string {

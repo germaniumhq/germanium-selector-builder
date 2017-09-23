@@ -108,6 +108,11 @@ def validate_xpath_selector(context, expected_selector):
     assertEqual('XPath(' + expected_selector + ')', context.resolved_selector)
 
 
+@step("I get the css selector: (u?\".*?\")")
+def validate_xpath_selector(context, expected_selector):
+    assertEqual('Css(' + expected_selector + ')', context.resolved_selector)
+
+
 @step("I try to find the returned xpath selector")
 def get_the_element_using_the_resolved_selector(context):
     context.found_element = eval(context.resolved_selector, globals(), locals()).element()
