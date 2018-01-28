@@ -445,7 +445,7 @@ class EventListener(object):
 
                 result = potential_result
             except Exception as e:
-                print e
+                print(e)
                 if isinstance(e, BrowserStateException):
                     raise e
 

@@ -1,7 +1,7 @@
-from PySide import QtGui
+from PySide2 import QtGui
 from io import StringIO
 
-from PySide.QtGui import QTextCharFormat, QSyntaxHighlighter, QFont
+from PySide2.QtGui import QTextCharFormat, QSyntaxHighlighter, QFont
 import keyword
 import germanium.selectors
 

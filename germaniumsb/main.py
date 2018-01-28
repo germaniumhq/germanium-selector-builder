@@ -1,7 +1,8 @@
 import sys
-from PySide import QtGui
-from PySide.QtGui import *
-from PySide.QtCore import *
+from PySide2 import QtGui
+from PySide2.QtWidgets import *
+from PySide2.QtGui import *
+from PySide2.QtCore import *
 from MainWindow import Ui_MainWindow
 from germanium.static import *
 import traceback
@@ -104,28 +105,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         pickElementMenu = QMenu(self.pickElementButton)
         pick_2_action = QAction("+1 reference", pickElementMenu)
-        pick_2_action.activated.connect(lambda: self._browser.pick(2))
+        pick_2_action.triggered.connect(lambda: self._browser.pick(2))
         pickElementMenu.addAction(pick_2_action)
         pick_3_action = QAction("+2 references", pickElementMenu)
-        pick_3_action.activated.connect(lambda: self._browser.pick(3))
+        pick_3_action.triggered.connect(lambda: self._browser.pick(3))
         pickElementMenu.addAction(pick_3_action)
         pick_4_action = QAction("+3 references", pickElementMenu)
-        pick_4_action.activated.connect(lambda: self._browser.pick(4))
+        pick_4_action.triggered.connect(lambda: self._browser.pick(4))
         pickElementMenu.addAction(pick_4_action)
         pick_5_action = QAction("+4 references", pickElementMenu)
-        pick_5_action.activated.connect(lambda: self._browser.pick(5))
+        pick_5_action.triggered.connect(lambda: self._browser.pick(5))
         pickElementMenu.addAction(pick_5_action)
 
         self.pickElementButton.setMenu(pickElementMenu)
         self.pickElementButton.clicked.connect(lambda: self._browser.pick(1))
 
-        self.actionPick.activated.connect(_(self._browser.pick))
+        self.actionPick.triggered.connect(_(self._browser.pick))
         self.actionPick.setShortcut("Ctrl+K")
 
         # this shouldn't need a new state
         self.highlightElementButton.clicked.connect(_(self.on_highlight_local_entry))
         self.actionHighlight.setShortcut("Ctrl+H")
-        self.actionHighlight.activated.connect(_(self.on_highlight_local_entry))
+        self.actionHighlight.triggered.connect(_(self.on_highlight_local_entry))
 
         self.pick_timer.timeout.connect(_(self.on_pick_timer))
 
