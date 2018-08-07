@@ -1,4 +1,7 @@
-from germanium.static import *
+from typing import Callable, Tuple, List
+from germaniumsb.local_types import ResultEvaluator, SelectorCallResult, ProcessingCall
+
+from germanium.static import Element, js, get_germanium
 import pkg_resources
 
 
@@ -38,7 +41,7 @@ def is_germaniumsb_injected():
     return js('return window["__germanium_loaded"];')
 
 
-def run_in_all_iframes(code, result_evaluator=None):
+def run_in_all_iframes(code, result_evaluator: ResultEvaluator=None) -> ProcessingCall:
     get_germanium().switch_to.default_content()
 
     def default_result_evaluator(result):
@@ -50,10 +53,11 @@ def run_in_all_iframes(code, result_evaluator=None):
     return _run_in_all_iframes_internal(code, result_evaluator)
 
 
-def _run_in_all_iframes_internal(code,
-                                 result_evaluator,
-                                 error_messages=None,
-                                 checked_frames=None):
+def _run_in_all_iframes_internal(
+        code: Callable[[], SelectorCallResult],
+        result_evaluator: ResultEvaluator,
+        error_messages: List[str]=None,
+        checked_frames=None) -> ProcessingCall:
     error_happened = False
     error_messages = error_messages if error_messages is not None else []
     checked_frames = checked_frames if checked_frames is not None else set()

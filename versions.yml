@@ -1,0 +1,15 @@
+version:
+  version: 1.0.0
+  files:
+    setup.py: version='**VERSION**',
+
+germanium:
+  version: parent:../germanium-build-system/@germanium
+  files:
+    requirements.txt: germanium==**VERSION$$
+
+requirements:
+  version: $(bin/requires_versions.py)
+  files:
+    setup.py: install_requires=[**VERSION**],
+

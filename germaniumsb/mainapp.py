@@ -3,7 +3,7 @@ from PySide2 import QtGui
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 from PySide2.QtCore import *
-from MainWindow import Ui_MainWindow
+from .MainWindow import Ui_MainWindow
 from germanium.static import *
 import traceback
 import os
@@ -21,6 +21,7 @@ from germaniumsb.inject_code import \
 from germaniumsb.pick_element import get_picked_element
 
 BROWSERS=["Chrome", "Firefox", "IE"]
+
 
 def base_dir(sub_path=""):
     # pth is set by pyinstaller with the folder where the application
@@ -228,6 +229,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.after_enter(BrowserState.PAUSED, _(self.highlightElementButton.hide))
         self._browser.after_leave(BrowserState.PAUSED, _(lambda: self.actionHighlight.setEnabled(True)))
         self._browser.after_enter(BrowserState.PAUSED, _(lambda: self.actionHighlight.setEnabled(False)))
+
         # pick button
         def pick_element_leave_state(ev):
             if ev.target_state is not BrowserState.READY:
@@ -361,12 +363,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 error_happened, \
                 error_messages = get_picked_element()
 
-            self._update_elements_to_find_label(data["pickCount"])
+            self._update_elements_to_find_label(data.pickCount)
 
             if not found_result:
                 return
 
-            self._browser.generate_selector(data["foundSelector"])
+            if not data:
+                raise Exception(f"Result was found, but the data is f{data}.")
+
+            self._browser.generate_selector(data.foundSelector)
         except Exception as e:
             self._browser.error(e)
 
@@ -432,8 +437,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self._browser.error_processed()
 
-
-if __name__ == '__main__':
+def main():
     app = QApplication(sys.argv)
     mainWin = MainWindow()
 
