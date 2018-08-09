@@ -1,7 +1,9 @@
 import unittest
 
-from behave import *
+from behave import use_step_matcher, step
+import time
 from germanium.static import *
+
 
 use_step_matcher("re")
 
@@ -29,7 +31,7 @@ def resolve_germanium_selector_in_js(context, source):
 
 
 @step("I try to pick the element `(.*?)`")
-def resolve_germanium_selector_in_js(context, source):
+def try_to_pick_the_element(context, source):
     # we inject first the code.
     loaded_code = read_file("js/main.js")
 
@@ -66,7 +68,7 @@ def pick_second_element(context, source):
 
 
 @step("using a first reference of: `(.*?)`")
-def pick_second_element(context, source):
+def using_first_reference_of(context, source):
     click(eval(source, globals(), dict()))
 
     assertEqual(js('return pickState.state;'), 'PICKING')
@@ -74,7 +76,7 @@ def pick_second_element(context, source):
 
 
 @step("using a second reference of: `(.*?)`")
-def pick_second_element(context, source):
+def using_a_second_reference_of(context, source):
     click(eval(source, globals(), dict()))
     context.resolved_selector = js('return germaniumGetPickedElement().foundSelector')
 
@@ -109,13 +111,18 @@ def validate_xpath_selector(context, expected_selector):
 
 
 @step("I get the css selector: (u?\".*?\")")
-def validate_xpath_selector(context, expected_selector):
+def validate_css_selector(context, expected_selector):
     assertEqual('Css(' + expected_selector + ')', context.resolved_selector)
 
 
 @step("I try to find the returned xpath selector")
 def get_the_element_using_the_resolved_selector(context):
     context.found_element = eval(context.resolved_selector, globals(), locals()).element()
+
+
+@step("I wait forever")
+def i_sleep_forever(context):
+    time.sleep(10000)
 
 
 @step("I get the element: `(.*?)`")

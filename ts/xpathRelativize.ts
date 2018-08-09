@@ -30,8 +30,8 @@ export function xpathRelativize(parentReferenceXPath: string,
         index++
     }
 
-    // if the targetNode is actually the parentNode, we return the parent XPath.
-    if (index == parentAbsoluteXPath.length) {
+    // if the targetNode is actually the parentNode, we return the parent XPath
+    if (index == parentAbsoluteXPath.length && index == targetAbsoluteXPath.length) {
         return parentReferenceXPath;
     }
 
