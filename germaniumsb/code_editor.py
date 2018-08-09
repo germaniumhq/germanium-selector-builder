@@ -1,9 +1,12 @@
-
+from typing import Dict
 import re
 
 
-def extract_code(full_text, cursor_position):
+def extract_code(full_text: str, cursor_position: Dict[str, int]) -> str:
     lines = str(full_text).split("\n")
+
+    if not lines[cursor_position['row']]:
+        return ""
 
     no_spaces = re.compile(r"^[^\s].*$")
 
