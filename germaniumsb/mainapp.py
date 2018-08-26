@@ -30,6 +30,7 @@ def base_dir(sub_path=""):
         return os.path.join(pth, sub_path)
     return os.path.abspath(os.path.dirname(__file__))
 
+
 def _(callable):
     """
     Make a new callable that ignores all its parameters, and just calls the

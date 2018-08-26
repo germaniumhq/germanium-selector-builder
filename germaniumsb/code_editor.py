@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 import re
 
 
@@ -10,7 +10,7 @@ def extract_code(full_text: str, cursor_position: Dict[str, int]) -> str:
 
     no_spaces = re.compile(r"^[^\s].*$")
 
-    result = []
+    result: List[str] = []
 
     for i in reversed(range(cursor_position['row'] + 1)):
         result.insert(0, lines[i])
@@ -27,7 +27,7 @@ def extract_code(full_text: str, cursor_position: Dict[str, int]) -> str:
     return str.join("\n", result).strip()
 
 
-def insert_code_into_editor(cursor, text):
+def insert_code_into_editor(cursor, text: str) -> None:
     cursor.beginEditBlock()
     cursor.insertText(text)
     cursor.endEditBlock()

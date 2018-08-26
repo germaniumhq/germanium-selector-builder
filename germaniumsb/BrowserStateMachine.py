@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Any, Dict, Optional, Callable
 import uuid
 
 
@@ -39,7 +40,10 @@ class BrowserStateChangeEvent(object):
     triggered on state changes.
     """
 
-    def __init__(self, previous_state, target_state, data):
+    def __init__(self,
+                 previous_state: Optional[BrowserState],
+                 target_state: BrowserState,
+                 data: Any) -> None:
         """
         Create a new event.
 
@@ -47,19 +51,19 @@ class BrowserStateChangeEvent(object):
         :param BrowserState target_state: The state that the state machine is transitioning to.
         :param object data: Optional data that is passed in the event.
         """
-        self._previousState = previous_state
-        self._targetState = target_state
+        self._previous_state = previous_state
+        self._target_state = target_state
         self.data = data
         self._cancelled = False
 
-    def cancel(self):
+    def cancel(self) -> None:
         """
         Cancel the current transition.
         """
         self._cancelled = True
 
     @property
-    def cancelled(self):
+    def cancelled(self) -> bool:
         """
         Is the current transition cancelled.
         :return:
@@ -67,32 +71,32 @@ class BrowserStateChangeEvent(object):
         return self._cancelled
 
     @property
-    def previous_state(self):
+    def previous_state(self) -> BrowserState:
         """
         The state from which we're transitioning.
         :return:
         """
-        return self._previousState
+        return self._previous_state
 
     @property
-    def target_state(self):
+    def target_state(self) -> BrowserState:
         """
         Thestate towards we're transitioning.
         :return:
         """
-        return self._targetState
+        return self._target_state
 
 
 class BrowserStateException(Exception):
     pass
 
 
-transition_set = dict()
-link_map = dict()
+transition_set: Dict[int, bool] = dict()
+link_map: Dict[BrowserState, Dict[str, BrowserState]] = dict()
 
 
-def register_transition(name, from_state, to_state):
-    transition_set[STATE_INDEX[from_state.value] << 16 | STATE_INDEX[to_state.value]] = True
+def register_transition(name: str, from_state: BrowserState, to_state: BrowserState) -> None:
+    transition_set[STATE_INDEX[from_state.value] << 14 | STATE_INDEX[to_state.value]] = True
 
     if not name:
         return
@@ -103,6 +107,7 @@ def register_transition(name, from_state, to_state):
         fromMap = link_map[from_state.value] = dict()
 
     fromMap[name] = to_state
+
 
 register_transition('application_initialized', BrowserState.NOT_INITIALIZED, BrowserState.STOPPED)
 register_transition('start_browser', BrowserState.STOPPED, BrowserState.STARTED)
@@ -141,10 +146,13 @@ register_transition('error_processed', BrowserState.BROWSER_NOT_STARTED, Browser
 register_transition('error_processed', BrowserState.BROWSER_NOT_READY, BrowserState.STARTED)
 
 
+ChangeStateEventListener = Callable[[BrowserStateChangeEvent], Optional[BrowserState]]
+
+
 class BrowserStateMachine(object):
-    def __init__(self, initial_state=None):
-        self._transition_listeners = dict()
-        self._data_listeners = dict()
+    def __init__(self, initial_state: Optional[BrowserState]=None) -> None:
+        self._transition_listeners: Dict[str, EventListener] = dict()
+        self._data_listeners: Dict[str, EventListener] = dict()
         self._initial_state = initial_state or BrowserState.NOT_INITIALIZED
 
         self._transition_listeners['NOT_INITIALIZED'] = EventListener()
@@ -171,59 +179,59 @@ class BrowserStateMachine(object):
         self._data_listeners['PAUSED'] = EventListener()
         self._data_listeners['BROWSER_NOT_STARTED'] = EventListener()
         self._data_listeners['BROWSER_NOT_READY'] = EventListener()
-        self._currentState = None
-        self._current_change_state_event = None
+        self._currentState = None  # type: Optional[BrowserState]
+        self._current_change_state_event = None  # type: Optional[BrowserStateChangeEvent]
 
     @property
-    def state(self):
+    def state(self) -> BrowserState:
         self._ensure_state_machine_initialized()
         return self._currentState
 
-    def application_initialized(self, data=None):
+    def application_initialized(self, data: Any=None) -> BrowserState:
         return self.transition("application_initialized", data)
 
-    def start_browser(self, data=None):
+    def start_browser(self, data: Any=None) -> BrowserState:
         return self.transition("start_browser", data)
 
-    def pick(self, data=None):
+    def pick(self, data: Any=None) -> BrowserState:
         return self.transition("pick", data)
 
-    def inject_code(self, data=None):
+    def inject_code(self, data: Any=None) -> BrowserState:
         return self.transition("inject_code", data)
 
-    def error(self, data=None):
+    def error(self, data: Any=None) -> BrowserState:
         return self.transition("error", data)
 
-    def close_browser(self, data=None):
+    def close_browser(self, data: Any=None) -> BrowserState:
         return self.transition("close_browser", data)
 
-    def error_processed(self, data=None):
+    def error_processed(self, data: Any=None) -> BrowserState:
         return self.transition("error_processed", data)
 
-    def ready(self, data=None):
+    def ready(self, data: Any=None) -> BrowserState:
         return self.transition("ready", data)
 
-    def error_injecting_code(self, data=None):
+    def error_injecting_code(self, data: Any=None) -> BrowserState:
         return self.transition("error_injecting_code", data)
 
-    def generate_selector(self, data=None):
+    def generate_selector(self, data: Any=None) -> BrowserState:
         return self.transition("generate_selector", data)
 
-    def toggle_pause(self, data=None):
+    def toggle_pause(self, data: Any=None) -> BrowserState:
         return self.transition("toggle_pause", data)
 
-    def cancel_pick(self, data=None):
+    def cancel_pick(self, data: Any=None) -> BrowserState:
         return self.transition("cancel_pick", data)
 
-    def _ensure_state_machine_initialized(self):
+    def _ensure_state_machine_initialized(self) -> None:
         if not self._currentState:
             self._change_state_impl(self._initial_state, None)
 
-    def changeState(self, targetState, data = None):
+    def changeState(self, targetState: BrowserState, data: Any=None) -> BrowserState:
         self._ensure_state_machine_initialized()
         return self._change_state_impl(targetState, data)
 
-    def _change_state_impl(self, targetState, data = None):
+    def _change_state_impl(self, targetState: BrowserState, data: Any=None) -> BrowserState:
         if not targetState:
             raise Exception("No target state specified. Can not change the state.")
 
@@ -232,7 +240,12 @@ class BrowserStateMachine(object):
         if targetState == self._currentState:
             return targetState
 
-        state_change_event = BrowserStateChangeEvent(self._currentState, targetState, data)
+        state_change_event: BrowserStateChangeEvent = BrowserStateChangeEvent(self._currentState, targetState, data)
+
+        if self._currentState and \
+                not transition_set.get(STATE_INDEX[self._currentState.value] << 14 | STATE_INDEX[targetState.value]):
+            print("No transition exists between %s -> %s." % (self._currentState.value, targetState.value))
+            return self._currentState
 
         if self._current_change_state_event:
             raise BrowserStateException(
@@ -244,16 +257,14 @@ class BrowserStateMachine(object):
                     targetState.value
                 ))
 
-        if self._currentState and not transition_set.get(STATE_INDEX[self._currentState.value] << 16 | STATE_INDEX[targetState.value]):
-            print("No transition exists between %s -> %s." % (self._currentState.value, targetState.value))
-            return self._currentState
-
         self._current_change_state_event = state_change_event
 
         if state_change_event.previous_state:
-            self._transition_listeners[state_change_event.previous_state.value].fire(EventType.BEFORE_LEAVE, state_change_event)
+            self._transition_listeners[state_change_event.previous_state.value]\
+                .fire(EventType.BEFORE_LEAVE, state_change_event)
 
-        self._transition_listeners[state_change_event.target_state.value].fire(EventType.BEFORE_ENTER, state_change_event)
+        self._transition_listeners[state_change_event.target_state.value]\
+            .fire(EventType.BEFORE_ENTER, state_change_event)
 
         if state_change_event.cancelled:
             return self._currentState
@@ -262,13 +273,15 @@ class BrowserStateMachine(object):
         self._current_change_state_event = None
 
         if state_change_event.previous_state:
-            self._transition_listeners[state_change_event.previous_state.value].fire(EventType.AFTER_LEAVE, state_change_event)
+            self._transition_listeners[state_change_event.previous_state.value]\
+                .fire(EventType.AFTER_LEAVE, state_change_event)
 
-        self._transition_listeners[state_change_event.target_state.value].fire(EventType.AFTER_ENTER, state_change_event)
+        self._transition_listeners[state_change_event.target_state.value]\
+            .fire(EventType.AFTER_ENTER, state_change_event)
 
         return self._currentState
 
-    def transition(self, link_name, data=None):
+    def transition(self, link_name: str, data: Any=None) -> BrowserState:
         """
         Transition into another state following a named transition.
 
@@ -277,6 +290,8 @@ class BrowserStateMachine(object):
         :return: BrowserState
         """
         self._ensure_state_machine_initialized()
+
+        assert self._currentState
 
         source_state = link_map.get(self._currentState.value)
 
@@ -296,7 +311,7 @@ class BrowserStateMachine(object):
 
         return self.changeState(targetState, data)
 
-    def before_enter(self, state, callback):
+    def before_enter(self, state: BrowserState, callback: Callable[[BrowserStateChangeEvent], Optional[BrowserState]]):
         """
         Add a transition listener that will fire before entering a new state.
         The transition can still be cancelled at this stage via `ev.cancel()`
@@ -308,7 +323,7 @@ class BrowserStateMachine(object):
         """
         return self._transition_listeners[state.value].add_listener(EventType.BEFORE_ENTER, callback)
 
-    def after_enter(self, state, callback):
+    def after_enter(self, state: BrowserState, callback: Callable[[BrowserStateChangeEvent], Optional[BrowserState]]):
         """
         Add a transition listener that will fire after the new state is entered.
         The transition can not be cancelled at this stage.
@@ -318,7 +333,7 @@ class BrowserStateMachine(object):
         """
         return self._transition_listeners[state.value].add_listener(EventType.AFTER_ENTER, callback)
 
-    def before_leave(self, state, callback):
+    def before_leave(self, state: BrowserState, callback: Callable[[BrowserStateChangeEvent], Optional[BrowserState]]):
         """
         Add a transition listener that will fire before leaving a state.
         The transition can be cancelled at this stage via `ev.cancel()`.
@@ -340,7 +355,7 @@ class BrowserStateMachine(object):
         """
         return self._transition_listeners[state.value].add_listener(EventType.AFTER_LEAVE, callback)
 
-    def on_data(self, state, callback):
+    def on_data(self, state: BrowserState, callback: Callable[[Any], Optional[BrowserState]]):
         """
         Add a data listener that will be called when data is being pushed for that transition.
 
@@ -350,7 +365,7 @@ class BrowserStateMachine(object):
         """
         return self._data_listeners[state.value].add_listener(EventType.DATA, callback)
 
-    def forward_data(self, new_state, data):
+    def forward_data(self, new_state: BrowserState, data: Any) -> None:
         """
         Changes the state machine into the new state, then sends the data
         ignoring the result. This is so on `onData` calls we can just
@@ -363,7 +378,7 @@ class BrowserStateMachine(object):
 
         return None
 
-    def send_state_data(self, new_state, data):
+    def send_state_data(self, new_state: BrowserState, data: Any) -> BrowserState:
         """
         Sends the data into the state machine, to be processed by listeners
         registered with `onData`.
@@ -371,6 +386,9 @@ class BrowserStateMachine(object):
         @param data The data to send.
         """
         self._ensure_state_machine_initialized()
+
+        assert self._currentState
+
         self.changeState(new_state, data)
 
         target_state = self._data_listeners[self._currentState.value].fire(EventType.DATA, data)
@@ -380,7 +398,9 @@ class BrowserStateMachine(object):
 
         return self._currentState
 
-    def send_data(self, data):
+    def send_data(self,
+                  data: Any=None,
+                  state: Optional[BrowserState]=None) -> BrowserState:
         """
         Transitions first the state machine into the new state, then it
         will send the data into the state machine.
@@ -388,7 +408,14 @@ class BrowserStateMachine(object):
         @param data
         """
         self._ensure_state_machine_initialized()
-        target_state = self._data_listeners[self._currentState.value].fire(EventType.DATA, data)
+
+        assert self._currentState
+
+        if state:
+            self.changeState(state)
+
+        target_state = self._data_listeners[self._currentState.value]\
+            .fire(EventType.DATA, data)
 
         if target_state:
             return self.changeState(target_state, data)
