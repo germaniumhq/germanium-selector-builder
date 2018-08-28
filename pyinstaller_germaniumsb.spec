@@ -38,7 +38,7 @@ def add_files(m):
         for name in files:
             full_path = os.path.join(root, name)
 
-a = Analysis(['germaniumsb/main.py'],
+a = Analysis(['application.py'],
              pathex=['./germaniumsb'],
              binaries=[],
              datas=datas,

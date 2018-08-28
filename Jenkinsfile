@@ -1,18 +1,17 @@
 
-stage('Build Docker EXE Creator') {
+stage('Build EXE') {
     node {
         deleteDir()
-
         checkout scm
 
         dockerBuild file: './jenkins/Dockerfile',
-            tags: ['bmst/pyinstaller-windows-py27']
+            tags: ['germaniumhq/germanium-selector-builder']
     }
 }
 
 stage('Build EXE File') {
     node {
-        dockerRun image: 'bmst/pyinstaller-windows-py27',
+        dockerRun image: 'germaniumhq/germanium-selector-builder',
             remove: true,
             env: [
                 'PYPI_URL=http://nexus:8081/repository/pypi-local/pypi',
