@@ -2,19 +2,16 @@ from typing import Callable, Tuple, Optional, List
 
 
 class SelectorCallResult(object):
-    pickCount: Optional[int]
-    foundSelector: Optional[str]
-
     def __init__(self,
-                 pickCount: Optional[int],
+                 pickCount: int,
                  foundSelector: Optional[str]) -> None:
         """
         Initialization.
         """
-        self.pickCount = pickCount
-        self.foundSelector = foundSelector
+        self.pickCount: int = pickCount
+        self.foundSelector: Optional[str] = foundSelector
 
 
 ResultEvaluator = Callable[[SelectorCallResult], Tuple[SelectorCallResult, bool]]
 
-ProcessingCall = Tuple[SelectorCallResult, bool, bool, List[str]]
+ProcessingCall = Tuple[Optional[SelectorCallResult], bool, bool, List[str]]

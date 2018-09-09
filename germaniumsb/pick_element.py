@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 
 from germanium.static import js
 
@@ -28,7 +28,11 @@ def get_picked_element() -> ProcessingCall:
             foundSelector=element["foundSelector"]
         )
 
-    def result_evaluator(call_result: SelectorCallResult) -> (SelectorCallResult, bool):
+    def result_evaluator(call_result: SelectorCallResult) -> Tuple[SelectorCallResult, bool]:
+        """
+        Evaluates if the call to find a query actually found an element, since
+        the JSON data might have missing fields, that will explode in the UI.
+        """
         if result.pickCount > call_result.pickCount:
             result.pickCount = call_result.pickCount
 

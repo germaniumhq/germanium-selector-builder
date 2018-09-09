@@ -1,10 +1,15 @@
 import sys
 from PySide2 import QtGui
-from PySide2.QtWidgets import *
-from PySide2.QtGui import *
-from PySide2.QtCore import *
+from PySide2.QtWidgets import QMainWindow, QApplication, QLabel, QMenu, QAction, QMessageBox
+from PySide2.QtCore import QTimer
 from .MainWindow import Ui_MainWindow
-from germanium.static import *
+from germanium.static import \
+    open_browser, \
+    close_browser, \
+    get_germanium, \
+    Css, \
+    XPath, \
+    highlight
 import traceback
 import os
 
@@ -277,7 +282,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             error_message = QMessageBox()
             error_message.setWindowTitle(self.tr("Unable to start browser"))
             error_message.setText(self.tr("Germanium was unable to start the browser: ") + str(e))
-            error_message.setDetailedText(traceback.format_exc(e))
+            error_message.setDetailedText(traceback.format_exc())
             error_message.setIcon(QMessageBox.Critical)
             error_message.exec_()
 
@@ -426,7 +431,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         error_message = QMessageBox()
         error_message.setWindowTitle(self.tr("Error"))
         error_message.setText(self.tr("Germanium Selector Builder has encountered an error: ") + str(ev.data))
-        error_message.setDetailedText(traceback.format_exc(ev.data))
+        error_message.setDetailedText(traceback.format_exc())
         error_message.setIcon(QMessageBox.Critical)
         error_message.setStandardButtons(QMessageBox.Close | QMessageBox.Ignore)
         error_message.setEscapeButton(QMessageBox.Ignore)

@@ -71,7 +71,7 @@ class BrowserStateChangeEvent(object):
         return self._cancelled
 
     @property
-    def previous_state(self) -> BrowserState:
+    def previous_state(self) -> Optional[BrowserState]:
         """
         The state from which we're transitioning.
         :return:
@@ -95,7 +95,7 @@ transition_set: Dict[int, bool] = dict()
 link_map: Dict[BrowserState, Dict[str, BrowserState]] = dict()
 
 
-def register_transition(name: str, from_state: BrowserState, to_state: BrowserState) -> None:
+def register_transition(name: Optional[str], from_state: BrowserState, to_state: BrowserState) -> None:
     transition_set[STATE_INDEX[from_state.value] << 14 | STATE_INDEX[to_state.value]] = True
 
     if not name:
@@ -185,6 +185,8 @@ class BrowserStateMachine(object):
     @property
     def state(self) -> BrowserState:
         self._ensure_state_machine_initialized()
+        assert self._currentState
+
         return self._currentState
 
     def application_initialized(self, data: Any=None) -> BrowserState:
@@ -248,6 +250,16 @@ class BrowserStateMachine(object):
             return self._currentState
 
         if self._current_change_state_event:
+            # The previous_state if it's None, is only set when the initial transition happens into
+            # the start state. Then only the *AFTER* callbacks are being invoked, not the *BEFORE*,
+            # because entering the initial state is not cancellable. The state machine is assumed to
+            # be in the initial state.
+            #
+            # Because of that, if there is another _current_change_state_event (i.e. set on a *BEFORE*
+            # callback), it's after being already in the initial state, hence having a previous_state.
+            assert self._currentState
+            assert self._current_change_state_event.previous_state
+
             raise BrowserStateException(
                 "The BrowserStateMachine is already in a changeState (%s -> %s). "
                 "Transitioning the state machine (%s -> %s) in `before` events is not supported." % (
@@ -266,7 +278,9 @@ class BrowserStateMachine(object):
         self._transition_listeners[state_change_event.target_state.value]\
             .fire(EventType.BEFORE_ENTER, state_change_event)
 
+        # The event can't be cancelled in the initial state.
         if state_change_event.cancelled:
+            assert self._currentState
             return self._currentState
 
         self._currentState = targetState
@@ -296,18 +310,18 @@ class BrowserStateMachine(object):
         source_state = link_map.get(self._currentState.value)
 
         if not source_state:
-            return None
+            return self._currentState
 
         if link_name not in source_state:
             print("There is no transition named `%s` starting from `%s`." %
                   (link_name, self._currentState.value))
 
-            return None
+            return self._currentState
 
         targetState = source_state[link_name]
 
         if not targetState:
-            return None
+            return self._currentState
 
         return self.changeState(targetState, data)
 
