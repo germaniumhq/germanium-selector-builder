@@ -1,0 +1,16 @@
+- name: Publish the Lastest Germanium Selector Builder
+  hosts: ciplogic
+  become: true
+  tasks:
+    - name: Upload the exe file.
+      synchronize:
+        src: /tmp/jenny/workspace/germanium-selector-builder2/workspace/archive/main.exe
+        dest: /opt/www/germaniumhq_get
+
+    - name: Change the owner to nginx
+      file:
+        path: /opt/www/germaniumhq_get/main.exe
+        owner: 100
+        group: 101
+
+
