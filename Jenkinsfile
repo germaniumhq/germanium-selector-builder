@@ -9,6 +9,8 @@ stage('Tooling') {
         {
             sh """
                 cd /src
+                pwd
+                ls -la
                 mypy application.py
             """
         }
