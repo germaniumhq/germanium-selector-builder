@@ -15,7 +15,7 @@ stage('Python Tooling') {
     }
 }
 
-stage('Build EXE') {
+stage('Build Standalone Binary') {
     def parallelBuilds = [:]
 
     parallelBuilds."Win32 Build" = {
@@ -23,30 +23,36 @@ stage('Build EXE') {
             deleteDir()
             checkout scm
 
-            dockerBuild file: './gbs/win32/Dockerfile',
-                build_args: ['GBS_PREFIX=gbs/win32/'],
+            dockerBuild file: './_gbs/win32/Dockerfile',
+                build_args: ['GBS_PREFIX=/_gbs/win32/'],
                 tags: ['germaniumhq/germanium-selector-builder:win32']
         }
     }
 
-    parralelBuilds."Linux Build" = {
+    parallelBuilds."Linux Build" = {
         node {
             deleteDir()
             checkout scm
 
-            dockerBuild file: './gbs/lin64/Dockerfile',
-                build_args: ['GBS_PREFIX=gbs/lin32/'],
+            dockerBuild file: './_gbs/lin64/Dockerfile',
+                build_args: ['GBS_PREFIX=/_gbs/lin64/'],
                 tags: ['germaniumhq/germanium-selector-builder:lin64']
+        }
     }
 
     parallel(parallelBuilds)
 }
 
-stage('Extract EXE File') {
+stage('Archive Binaries') {
     node {
         docker.image('germaniumhq/germanium-selector-builder:win32')
               .inside {
             archiveArtifacts artifacts: '/src/dist/main.exe', fingerprint: true
+        }
+
+        docker.image('germaniumhq/germanium-selector-builder:lin64')
+              .inside {
+            archiveArtifacts artifacts: '/src/dist/main', fingerprint: true
         }
     }
 }
