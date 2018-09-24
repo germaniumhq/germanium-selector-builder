@@ -1,4 +1,4 @@
-stage('Python Tooling') {
+stage('Tooling') {
     node {
         deleteDir()
         checkout scm
@@ -15,7 +15,7 @@ stage('Python Tooling') {
     }
 }
 
-stage('Build Standalone Binary') {
+stage('Build') {
     def parallelBuilds = [:]
 
     parallelBuilds."Win32 Build" = {
@@ -43,17 +43,25 @@ stage('Build Standalone Binary') {
     parallel(parallelBuilds)
 }
 
-stage('Archive Binaries') {
+stage('Archive') {
     node {
-        docker.image('germaniumhq/germanium-selector-builder:win32')
-              .inside {
-            archiveArtifacts artifacts: '/src/dist/main.exe', fingerprint: true
+        def parallelArchiving = [:]
+
+        parallelArchiving."Win 32" = {
+            docker.image('germaniumhq/germanium-selector-builder:win32')
+                  .inside {
+                archiveArtifacts artifacts: '/src/dist/main.exe', fingerprint: true
+            }
         }
 
-        docker.image('germaniumhq/germanium-selector-builder:lin64')
-              .inside {
-            archiveArtifacts artifacts: '/src/dist/main', fingerprint: true
+        parallelArchiving."Lin 64" = {
+            docker.image('germaniumhq/germanium-selector-builder:lin64')
+                  .inside {
+                archiveArtifacts artifacts: '/src/dist/main', fingerprint: true
+            }
         }
+
+        parallel(parallelArchiving)
     }
 }
 
