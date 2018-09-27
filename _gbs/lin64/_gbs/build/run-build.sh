@@ -1,1 +1,1 @@
-pyinstaller_germaniumsb.spec
+pyinstaller pyinstaller_germaniumsb.spec
