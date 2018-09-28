@@ -1,4 +1,5 @@
 germaniumPyExePipeline(
+    that: this,
     binaries: [
         "Win 32": [
             gbs: "/_gbs/win32/",
