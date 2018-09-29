@@ -1,5 +1,5 @@
 germaniumPyExePipeline(
-    that: this,
+    runFlake8: false,
     binaries: [
         "Win 32": [
             gbs: "/_gbs/win32/",
