@@ -1,3 +1,5 @@
+from typing import TypeVar, Callable
+
 import sys
 from PySide2 import QtGui
 from PySide2.QtWidgets import QMainWindow, QApplication, QLabel, QMenu, QAction, QMessageBox
@@ -24,8 +26,10 @@ from germaniumsb.inject_code import \
     run_in_all_iframes
 
 from germaniumsb.pick_element import get_picked_element
+import germaniumsb.help_show as help_show
 
 BROWSERS=["Chrome", "Firefox", "IE"]
+T = TypeVar("T")
 
 
 def base_dir(sub_path=""):
@@ -36,7 +40,7 @@ def base_dir(sub_path=""):
     return os.path.abspath(os.path.dirname(__file__))
 
 
-def _(callable):
+def _(callable: Callable[..., T]) -> Callable[[], T]:
     """
     Make a new callable that ignores all its parameters, and just calls the
     given callable.
@@ -134,6 +138,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.highlightElementButton.clicked.connect(_(self.on_highlight_local_entry))
         self.actionHighlight.setShortcut("Ctrl+H")
         self.actionHighlight.triggered.connect(_(self.on_highlight_local_entry))
+
+        # help
+        self.actionGermaniumHelp.triggered.connect(_(help_show.help_show))
+        self.actionGermaniumHelp.setShortcut("F1")
 
         self.pick_timer.timeout.connect(_(self.on_pick_timer))
 

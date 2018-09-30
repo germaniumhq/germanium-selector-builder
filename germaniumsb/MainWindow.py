@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './germaniumsb/MainWindow.ui'
+# Form implementation generated from reading ui file 'germaniumsb/MainWindow.ui',
+# licensing of 'germaniumsb/MainWindow.ui' applies.
 #
-# Created: Sun Jan 28 23:54:34 2018
-#      by: pyside2-uic 2.0.0 running on PySide2 2.0.0~alpha0
+# Created: Sun Sep 30 05:05:53 2018
+#      by: pyside2-uic  running on PySide2 5.11.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -78,20 +79,24 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-        self.action_About = QtWidgets.QAction(MainWindow)
-        self.action_About.setObjectName("action_About")
+        self.actionAbout = QtWidgets.QAction(MainWindow)
+        self.actionAbout.setObjectName("actionAbout")
         self.actionHighlight = QtWidgets.QAction(MainWindow)
         self.actionHighlight.setEnabled(False)
         self.actionHighlight.setObjectName("actionHighlight")
         self.actionPick = QtWidgets.QAction(MainWindow)
         self.actionPick.setEnabled(False)
         self.actionPick.setObjectName("actionPick")
-        self.actionAbout_QT = QtWidgets.QAction(MainWindow)
-        self.actionAbout_QT.setObjectName("actionAbout_QT")
+        self.actionAboutQt = QtWidgets.QAction(MainWindow)
+        self.actionAboutQt.setObjectName("actionAboutQt")
         self.actionSwitch_Selector_Mode = QtWidgets.QAction(MainWindow)
         self.actionSwitch_Selector_Mode.setObjectName("actionSwitch_Selector_Mode")
-        self.menuHelp.addAction(self.action_About)
-        self.menuHelp.addAction(self.actionAbout_QT)
+        self.actionGermaniumHelp = QtWidgets.QAction(MainWindow)
+        self.actionGermaniumHelp.setObjectName("actionGermaniumHelp")
+        self.menuHelp.addAction(self.actionGermaniumHelp)
+        self.menuHelp.addSeparator()
+        self.menuHelp.addAction(self.actionAbout)
+        self.menuHelp.addAction(self.actionAboutQt)
         self.menuExecute.addAction(self.actionHighlight)
         self.menuExecute.addAction(self.actionPick)
         self.menuExecute.addSeparator()
@@ -112,9 +117,10 @@ class Ui_MainWindow(object):
         self.cancelPickButton.setText(QtWidgets.QApplication.translate("MainWindow", "Cancel Pick", None, -1))
         self.menuHelp.setTitle(QtWidgets.QApplication.translate("MainWindow", "He&lp", None, -1))
         self.menuExecute.setTitle(QtWidgets.QApplication.translate("MainWindow", "E&xecute", None, -1))
-        self.action_About.setText(QtWidgets.QApplication.translate("MainWindow", "&About", None, -1))
+        self.actionAbout.setText(QtWidgets.QApplication.translate("MainWindow", "&About", None, -1))
         self.actionHighlight.setText(QtWidgets.QApplication.translate("MainWindow", "&Highlight", None, -1))
         self.actionPick.setText(QtWidgets.QApplication.translate("MainWindow", "&Pick", None, -1))
-        self.actionAbout_QT.setText(QtWidgets.QApplication.translate("MainWindow", "About &QT", None, -1))
+        self.actionAboutQt.setText(QtWidgets.QApplication.translate("MainWindow", "About &Qt", None, -1))
         self.actionSwitch_Selector_Mode.setText(QtWidgets.QApplication.translate("MainWindow", "Switch Selector Mode", None, -1))
+        self.actionGermaniumHelp.setText(QtWidgets.QApplication.translate("MainWindow", "&GermaniumSB Help", None, -1))
 
