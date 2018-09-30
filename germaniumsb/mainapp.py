@@ -1,4 +1,4 @@
-from typing import TypeVar, Callable
+from typing import TypeVar, Callable, Optional
 
 import sys
 from PySide2 import QtGui
@@ -54,7 +54,7 @@ def _(callable: Callable[..., T]) -> Callable[[], T]:
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self):
+    def __init__(self) -> None:
         super(MainWindow, self).__init__()
         self.pick_timer = QTimer(self)
 
@@ -86,20 +86,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self._browser.application_initialized()
 
-    def set_window_icon(self):
+    def set_window_icon(self) -> None:
         icon = QtGui.QIcon()
         icon_path = os.path.join(base_dir("germaniumsb"), "favicon.ico")
 
         icon.addPixmap(QtGui.QPixmap(icon_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(icon)
 
-    def assign_widgets(self):
+    def assign_widgets(self) -> None:
         self._setup_buttons_visibilities()
         self._show_application_status()
         self._setup_state_change_listeners()
         self._setup_user_events_listeners()
 
-    def _setup_user_events_listeners(self):
+    def _setup_user_events_listeners(self) -> None:
         """
         Wires the user events to methods. This includes the actions
         that are defined.
@@ -139,13 +139,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionHighlight.setShortcut("Ctrl+H")
         self.actionHighlight.triggered.connect(_(self.on_highlight_local_entry))
 
-        # help
+        # help        
         self.actionGermaniumHelp.triggered.connect(_(help_show.help_show))
         self.actionGermaniumHelp.setShortcut("F1")
 
         self.pick_timer.timeout.connect(_(self.on_pick_timer))
 
-    def _setup_state_change_listeners(self):
+    def _setup_state_change_listeners(self) -> None:
         """
          This setups the actions on transitions in the state
          machine. For example injecting code, or trying to
@@ -178,7 +178,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self._browser.after_leave(BrowserState.PICKING, _(lambda: self._update_elements_to_find_label(-1)))
 
-    def on_focus_changed(self, old_widget, new_widget):
+    def on_focus_changed(self, old_widget, new_widget) -> None:
         """
         Method called from QT whenever the focus changes inside
         the application.
@@ -192,7 +192,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if new_widget == self.codeEdit:
             return
 
-    def _show_application_status(self):
+    def _show_application_status(self) -> None:
         """
         Wire the status label on state changes to show the
         state of the application.
@@ -215,7 +215,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.before_enter(BrowserState.ERROR,
                                    lambda ev: self.status_label.setText("Status: Error :( ..."))
 
-    def _setup_buttons_visibilities(self):
+    def _setup_buttons_visibilities(self) -> None:
         """
         Changes the buttons visibilities and/or disables actions
         depending on the actions availabilities starting from
@@ -275,7 +275,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._browser.after_leave(BrowserState.PAUSED, live_leave_state)
         self._browser.after_leave(BrowserState.GENERATING_SELECTOR, live_leave_state)
 
-    def _update_elements_to_find_label(self, count):
+    def _update_elements_to_find_label(self, count) -> None:
         if self._browser.state != BrowserState.PICKING:
             self.pick_element_count_label.setText("Not picking elements")
         elif count == 1:
@@ -283,7 +283,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.pick_element_count_label.setText("%s elements to pick" % str(count))
 
-    def start_browser(self):
+    def start_browser(self) -> Optional[BrowserState]:
         try:
             open_browser(BROWSERS[self.browserCombo.currentIndex()])
         except Exception as e:
@@ -295,8 +295,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             error_message.exec_()
 
             return BrowserState.STOPPED
+        
+        return None
 
-    def stop_browser(self):
+    def stop_browser(self) -> None:
         """
         Code called when we're supposed to tear down the browser.
         :return:
@@ -304,7 +306,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if get_germanium():
             close_browser()
 
-    def inject_code(self):
+    def inject_code(self) -> None:
         try:
             _, _, error_happened, error_messages = inject_into_current_document()
 
@@ -317,14 +319,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self._browser.error(e)
             return
 
-    def start_picking_element(self, count):
+    def start_picking_element(self, count) -> None:
         _, _, error_happened, error_messages = start_picking_into_current_document(count)
 
         if error_happened:
             self._browser.error_injecting_code(error_messages)
             return
 
-    def stop_picking_element(self, ev):
+    def stop_picking_element(self, ev) -> None:
         #
         # In case we're generating the selector, we need to keep the
         # iframe correct, so we're not switching until the selector
@@ -342,7 +344,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self._browser.error(error_messages)
             return
 
-    def injecting_code_failed(self, ev):
+    def injecting_code_failed(self, ev) -> None:
         """
         This code will be called when the injection will fail
         for a document several times.
@@ -366,7 +368,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self._browser.error_processed()
 
-    def on_pick_timer(self):
+    def on_pick_timer(self) -> None:
         try:
             if not is_germaniumsb_injected():
                 self._browser.inject_code()
@@ -377,10 +379,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 error_happened, \
                 error_messages = get_picked_element()
 
-            self._update_elements_to_find_label(data.pickCount)
-
             if not found_result:
                 return
+
+            assert data
+
+            self._update_elements_to_find_label(data.pickCount)
 
             if not data:
                 raise Exception(f"Result was found, but the data is f{data}.")
@@ -389,7 +393,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         except Exception as e:
             self._browser.error(e)
 
-    def generate_selector(self, ev):
+    def generate_selector(self, ev) -> None:
         try:
             text_selector = ev.data
             text_cursor = self.codeEdit.textCursor()
@@ -399,7 +403,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         except Exception as e:
             self._browser.error(e)
 
-    def browser_not_available(self):
+    def browser_not_available(self) -> None:
         QMessageBox.critical(self,
                              self.tr("No Browser Available"),
                              "You need to start a browser, and wait for it to load before picking"
@@ -408,7 +412,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self._browser.error_processed()
 
-    def on_highlight_local_entry(self):
+    def on_highlight_local_entry(self) -> None:
         text_cursor = self.codeEdit.textCursor()
         cursor_location = {"column": text_cursor.columnNumber(), "row": text_cursor.blockNumber()}
 
@@ -427,7 +431,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             run_in_all_iframes(highlight_selector)
 
         if found_elements is not None:
-            self.found_element_count_label.setText("Found: %d" % found_elements)
+            self.found_element_count_label.setText("Found: %d" % found_elements.pickCount)
         else:
             self.found_element_count_label.setText("Found: 0")
             QMessageBox.critical(self,
@@ -435,7 +439,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                  "No element was found for the given selector.",
                                  QMessageBox.Close)
 
-    def on_error(self, ev):
+    def on_error(self, ev) -> None:
         error_message = QMessageBox()
         error_message.setWindowTitle(self.tr("Error"))
         error_message.setText(self.tr("Germanium Selector Builder has encountered an error: ") + str(ev.data))
@@ -451,7 +455,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self._browser.error_processed()
 
-def main():
+def main() -> None:
     app = QApplication(sys.argv)
     mainWin = MainWindow()
 

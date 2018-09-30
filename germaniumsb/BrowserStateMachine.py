@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict, Optional, Callable
+from typing import Any, Dict, Optional, Callable, Union
 import uuid
 
 
@@ -146,7 +146,10 @@ register_transition('error_processed', BrowserState.BROWSER_NOT_STARTED, Browser
 register_transition('error_processed', BrowserState.BROWSER_NOT_READY, BrowserState.STARTED)
 
 
-ChangeStateEventListener = Callable[[BrowserStateChangeEvent], Optional[BrowserState]]
+ChangeStateEventListener = Union[
+    Callable[[], Optional[BrowserState]],
+    Callable[[BrowserStateChangeEvent], Optional[BrowserState]]
+]                             
 
 
 class BrowserStateMachine(object):
@@ -325,7 +328,7 @@ class BrowserStateMachine(object):
 
         return self.changeState(targetState, data)
 
-    def before_enter(self, state: BrowserState, callback: Callable[[BrowserStateChangeEvent], Optional[BrowserState]]):
+    def before_enter(self, state: BrowserState, callback: ChangeStateEventListener):
         """
         Add a transition listener that will fire before entering a new state.
         The transition can still be cancelled at this stage via `ev.cancel()`
@@ -337,7 +340,7 @@ class BrowserStateMachine(object):
         """
         return self._transition_listeners[state.value].add_listener(EventType.BEFORE_ENTER, callback)
 
-    def after_enter(self, state: BrowserState, callback: Callable[[BrowserStateChangeEvent], Optional[BrowserState]]):
+    def after_enter(self, state: BrowserState, callback: ChangeStateEventListener):
         """
         Add a transition listener that will fire after the new state is entered.
         The transition can not be cancelled at this stage.
@@ -347,7 +350,7 @@ class BrowserStateMachine(object):
         """
         return self._transition_listeners[state.value].add_listener(EventType.AFTER_ENTER, callback)
 
-    def before_leave(self, state: BrowserState, callback: Callable[[BrowserStateChangeEvent], Optional[BrowserState]]):
+    def before_leave(self, state: BrowserState, callback: ChangeStateEventListener):
         """
         Add a transition listener that will fire before leaving a state.
         The transition can be cancelled at this stage via `ev.cancel()`.
@@ -358,7 +361,7 @@ class BrowserStateMachine(object):
         """
         return self._transition_listeners[state.value].add_listener(EventType.BEFORE_LEAVE, callback)
 
-    def after_leave(self, state, callback):
+    def after_leave(self, state: BrowserState, callback: ChangeStateEventListener):
         """
         Add a transition listener that will fire after leaving a state.
         The transition can not be cancelled at this stage.
