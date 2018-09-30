@@ -143,6 +143,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionGermaniumHelp.triggered.connect(_(help_show.help_show))
         self.actionGermaniumHelp.setShortcut("F1")
 
+        self.actionAboutQt.triggered.connect(lambda: help_show.help_about_qt(self))
+        self.actionAbout.triggered.connect(lambda: help_show.help_about(self))
+
         self.pick_timer.timeout.connect(_(self.on_pick_timer))
 
     def _setup_state_change_listeners(self) -> None:

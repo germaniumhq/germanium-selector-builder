@@ -3,7 +3,11 @@ from PySide2.QtCore import QEvent
 from PySide2.QtGui import QIcon
 
 
-class QDialog:
+class QWidget:
+    pass
+
+
+class QDialog(QWidget):
     def __init__(self):
         self.modal: bool
         self.sizeGripEnabled: bool
@@ -98,3 +102,13 @@ class QMessageBox(QDialog):
                  button_ids: int) -> None:
         pass
 
+    @staticmethod
+    def aboutQt(parent: QWidget,
+                title: str) -> None:
+        pass
+
+    @staticmethod
+    def about(parent: QWidget,
+              title: str,
+              text: str) -> None:
+        pass
