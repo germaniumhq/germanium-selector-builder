@@ -26,7 +26,8 @@ def add_files(m, module_name):
 
 datas = [
     ('js/main.js', 'js'),
-    (germaniumdrivers.ensure_driver('chrome'), r'germaniumdrivers\binary\chrome\win\32')
+    (germaniumdrivers.ensure_driver('chrome'), r'germaniumdrivers/binary/chrome/linux/64'),
+    (germaniumdrivers.ensure_driver('firefox'), r'germaniumdrivers/binary/firefox/linux/64'),
 ]
 
 datas.append(('germaniumsb/favicon.ico', 'germaniumsb/'))
