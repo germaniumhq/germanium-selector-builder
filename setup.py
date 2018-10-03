@@ -20,7 +20,7 @@ setup(
     packages=['germaniumsb'],
     entry_points={
         "console_scripts": [
-            "germaniumsb = germaniumsb/mainapp:main"
+            "germaniumsb = germaniumsb.mainapp:main"
         ]
     },
     install_requires=[],
