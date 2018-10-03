@@ -1,7 +1,10 @@
 from setuptools import setup
+from setuptools import find_packages
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
+
+packages = find_packages()
 
 setup(
     name='germaniumsb',
@@ -15,6 +18,13 @@ setup(
         'germanium==2.0.6'
     ],
     packages=['germaniumsb'],
+    entry_points={
+        "console_scripts": [
+            "germaniumsb = germaniumsb/mainapp:main"
+        ]
+    },
+    install_requires=[],
+    packages=packages,
     package_data={
         'germaniumsb': ['*.js'],
     }

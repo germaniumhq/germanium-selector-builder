@@ -18,12 +18,6 @@ def add_files(m, module_name):
                 #print(full_path)
                 datas.append( (full_path, os.path.join(module_name + root[len(module_path):]) ) )
 
-#datas = [
-#    ('js/main.js', 'js'),
-#    (germaniumdrivers.ensure_driver('chrome'), r'germaniumdrivers\binary\chrome\win\32'),
-#    (germaniumdrivers.ensure_driver('ie'), r'germaniumdrivers\binary\ie\win\32')
-#]
-
 datas = [
     ('js/main.js', 'js'),
     (germaniumdrivers.ensure_driver('chrome'), r'germaniumdrivers/binary/chrome/linux/64'),
@@ -39,7 +33,7 @@ def add_files(m):
         for name in files:
             full_path = os.path.join(root, name)
 
-a = Analysis(['application.py'],
+a = Analysis(['germaniumsb/mainapp.py'],
              pathex=['./germaniumsb'],
              binaries=[],
              datas=datas,

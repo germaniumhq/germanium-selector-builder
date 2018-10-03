@@ -4,7 +4,6 @@ import sys
 from PySide2 import QtGui
 from PySide2.QtWidgets import QMainWindow, QApplication, QLabel, QMenu, QAction, QMessageBox
 from PySide2.QtCore import QTimer
-from .MainWindow import Ui_MainWindow
 from germanium.static import \
     open_browser, \
     close_browser, \
@@ -15,6 +14,7 @@ from germanium.static import \
 import traceback
 import os
 
+from germaniumsb.MainWindow import Ui_MainWindow
 from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
 from germaniumsb.PythonHighlighter import PythonHighlighter
 from germaniumsb.code_editor import extract_code, insert_code_into_editor
@@ -458,6 +458,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self._browser.error_processed()
 
+
 def main() -> None:
     app = QApplication(sys.argv)
     mainWin = MainWindow()
@@ -466,4 +467,8 @@ def main() -> None:
 
     ret = app.exec_()
     close_browser()
-    sys.exit( ret )
+    sys.exit(ret)
+
+
+if __name__ == '__main__':
+    main()

@@ -14,5 +14,6 @@
     "typescript": "2.5.2",
     "uglifyjs-webpack-plugin": "0.4.6",
     "webpack": "^1.13.2"
-  }
+  },
+  "dependencies": {}
 }
