@@ -7,16 +7,27 @@ import germaniumdrivers
 
 import germanium
 
-def add_files(m, module_name):
-    for module_path in m.__path__:
-        for root, dirs, files in os.walk(module_path):
-            for name in files:
-                if not name.endswith('.js'):
-                    continue
 
-                full_path = os.path.join(root, name)
-                #print(full_path)
-                datas.append( (full_path, os.path.join(module_name + root[len(module_path):]) ) )
+ALLOWED_EXTENSIONS=['.js', '.html', '.png', '.chm', '.ico']
+
+
+def add_module(m, module_name):
+    for module_path in m.__path__:
+        add_files(module_path, module_name)
+
+
+def add_files(module_path, module_name):
+    for root, dirs, files in os.walk(module_path):
+        for name in files:
+            _, file_extension = os.path.splitext(name)
+
+            if file_extension not in ALLOWED_EXTENSIONS:
+                continue
+
+            full_path = os.path.join(root, name)
+            #print(full_path)
+            datas.append( (full_path, os.path.join(module_name + root[len(module_path):]) ) )
+
 
 datas = [
     ('js/main.js', 'js'),
@@ -25,9 +36,8 @@ datas = [
     (germaniumdrivers.ensure_driver('firefox'), r'germaniumdrivers\binary\firefox\win\64')
 ]
 
-datas.append(('germaniumsb/favicon.ico', 'germaniumsb/'))
-
-add_files(germanium, "germanium")
+add_module(germanium, "germanium")
+add_files("germaniumsb", "germaniumsb")
 
 def add_files(m):
     for root, dirs, files in os.walk(m.__path__):
