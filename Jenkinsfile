@@ -9,8 +9,8 @@ germaniumPyExePipeline(
                 dockerRun image: 'bmst/chm-generator',
                     remove: true,
                     volumes: [
-                        "${pwd()}/doc/:/src",
-                        "${pwd()}/doc/:/out"
+                        "${pwd()}/germaniumsb/doc/:/src",
+                        "${pwd()}/germaniumsb/doc/:/out"
                     ]
             }
         ],
@@ -23,7 +23,7 @@ germaniumPyExePipeline(
                 dockerRun image: 'bmst/docker-asciidoctor',
                     remove: true,
                     volumes: [
-                        "${pwd()}/doc/:/documents:rw"
+                        "${pwd()}/germaniumsb/doc/:/documents:rw"
                     ],
                     command: 'asciidoctor index.adoc'
             }

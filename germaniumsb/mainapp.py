@@ -32,14 +32,6 @@ BROWSERS=["Chrome", "Firefox", "IE"]
 T = TypeVar("T")
 
 
-def base_dir(sub_path=""):
-    # pth is set by pyinstaller with the folder where the application
-    # will be unpacked.
-    if 'pth' in globals():
-        return os.path.join(pth, sub_path)
-    return os.path.abspath(os.path.dirname(__file__))
-
-
 def _(callable: Callable[..., T]) -> Callable[[], T]:
     """
     Make a new callable that ignores all its parameters, and just calls the
@@ -88,7 +80,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def set_window_icon(self) -> None:
         icon = QtGui.QIcon()
-        icon_path = os.path.join(base_dir("germaniumsb"), "favicon.ico")
+        icon_path = os.path.join(help_show.base_dir("germaniumsb"), "favicon.ico")
 
         icon.addPixmap(QtGui.QPixmap(icon_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(icon)

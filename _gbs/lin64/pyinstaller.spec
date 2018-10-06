@@ -7,11 +7,17 @@ import germaniumdrivers
 
 import germanium
 
+
+ALLOWED_EXTENSIONS=['.js', '.html', '.png', '.chm']
+
+
 def add_files(m, module_name):
     for module_path in m.__path__:
         for root, dirs, files in os.walk(module_path):
             for name in files:
-                if not name.endswith('.js'):
+                _, file_extension = os.path.splitext(name)
+
+                if file_extension not in ALLOWED_EXTENSIONS:
                     continue
 
                 full_path = os.path.join(root, name)

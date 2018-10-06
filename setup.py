@@ -25,5 +25,7 @@ setup(
     packages=packages,
     package_data={
         'germaniumsb': ['*.js'],
+        'germaniumsb.doc': ['*.html', '*.chm'],
+        'germainumsb.doc.images': ['*.png']
     }
 )
