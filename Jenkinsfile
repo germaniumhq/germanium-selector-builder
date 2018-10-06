@@ -3,7 +3,7 @@ germaniumPyExePipeline(
     binaries: [
         "Win 32": [
             gbs: "/_gbs/win32/",
-            exe: "/src/dist/main.exe",
+            exe: "/src/dist/germaniumsb.exe",
             dockerTag: "germaniumhq/germanium-selector-builder:win32",
             extraSteps: {
                 dockerRun image: 'bmst/chm-generator',
@@ -17,7 +17,7 @@ germaniumPyExePipeline(
 
         "Lin 64": [
             gbs: "/_gbs/lin64/",
-            exe: "/src/dist/main",
+            exe: "/src/dist/germaniumsb",
             dockerTag: "germaniumhq/germanium-selector-builder:lin64",
             extraSteps: {
                 dockerRun image: 'bmst/docker-asciidoctor',

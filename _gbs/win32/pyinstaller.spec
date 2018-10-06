@@ -8,7 +8,7 @@ import germaniumdrivers
 import germanium
 
 
-ALLOWED_EXTENSIONS=['.js', '.html', '.png', '.chm', '.ico']
+ALLOWED_EXTENSIONS=['.js', '.html', '.png', '.chm']
 
 
 def add_module(m, module_name):
@@ -35,6 +35,8 @@ datas = [
     (germaniumdrivers.ensure_driver('ie'), r'germaniumdrivers\binary\ie\win\32'),
     (germaniumdrivers.ensure_driver('firefox'), r'germaniumdrivers\binary\firefox\win\64')
 ]
+
+datas.append(('germaniumsb/favicon.ico', 'germaniumsb/'))
 
 add_module(germanium, "germanium")
 add_files("germaniumsb", "germaniumsb")

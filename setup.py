@@ -8,7 +8,7 @@ packages = find_packages()
 
 setup(
     name='germaniumsb',
-    version='2.0.6',
+    version='1.0.0',
     description='Germanium Selector Builder',
     long_description = readme,
     author='Bogdan Mustiata',
@@ -19,9 +19,7 @@ setup(
             "germaniumsb = germaniumsb.mainapp:main"
         ]
     },
-	install_requires=[
-        'germanium==2.0.6'
-    ],
+	install_requires=["germanium==2.0.11"],
     packages=packages,
     package_data={
         'germaniumsb': ['*.js'],

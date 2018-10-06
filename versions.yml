@@ -1,7 +1,11 @@
 version:
-  version: 1.0.0
+  version: $(version-manager --tag)
   files:
     setup.py: version='**VERSION**',
+    germaniumsb/MainWindow.py: '"Germanium Selector Builder **VERSION**"'
+    germaniumsb/MainWindow.ui: '<string>Germanium Selector Builder **VERSION**</string>'
+    germaniumsb/doc/index.adoc: = Germanium Selector Builder **VERSION$$
+
 
 germanium:
   version: parent:../germanium-build-system/@germanium

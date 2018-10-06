@@ -1,4 +1,4 @@
-= Germanium Selector Builder
+= Germanium Selector Builder 1.0.0
 
 A simple yet powerful program to help you write Selenium selectors from
 GermaniumHQ.

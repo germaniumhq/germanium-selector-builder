@@ -107,7 +107,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QtWidgets.QApplication.translate("MainWindow", "Germanium Selector Builder v2.0.5", None, -1))
+        MainWindow.setWindowTitle(QtWidgets.QApplication.translate("MainWindow", "Germanium Selector Builder 1.0.0", None, -1))
         self.browserLabel.setText(QtWidgets.QApplication.translate("MainWindow", "Browser:", None, -1))
         self.startBrowserButton.setText(QtWidgets.QApplication.translate("MainWindow", "Start", None, -1))
         self.stopBrowserButton.setText(QtWidgets.QApplication.translate("MainWindow", "Stop", None, -1))
