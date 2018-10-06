@@ -1,5 +1,6 @@
 import subprocess
 import os
+import sys
 from PySide2.QtWidgets import QWidget, QMessageBox
 
 
@@ -12,6 +13,15 @@ def base_dir(sub_path=""):
 
 
 def help_show() -> None:
+    if sys.platform.startswith("win"):
+        documentation_path = os.path.abspath(
+            os.path.join(
+                base_dir("germaniumsb"), "doc", "index.chm"))
+        subprocess.check_call(['start', documentation_path])
+
+        return
+
+
     documentation_path = os.path.abspath(
         os.path.join(
             base_dir("germaniumsb"), "doc", "index.html"))
