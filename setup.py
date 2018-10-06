@@ -14,16 +14,14 @@ setup(
     author='Bogdan Mustiata',
     author_email='bogdan.mustiata@gmail.com',
     license='Affero GPL',
-	install_requires=[
-        'germanium==2.0.6'
-    ],
-    packages=['germaniumsb'],
     entry_points={
         "console_scripts": [
             "germaniumsb = germaniumsb.mainapp:main"
         ]
     },
-    install_requires=[],
+	install_requires=[
+        'germanium==2.0.6'
+    ],
     packages=packages,
     package_data={
         'germaniumsb': ['*.js'],
