@@ -1,0 +1,51 @@
+= Germanium Selector Builder
+
+A simple yet powerful program to help you write Selenium selectors from
+GermaniumHQ.
+
+== Introduction
+
+Selenium works with selectors to find the elements that the test will interact
+with. For example to interact with the google search, after opening the
+browser, to fetch the input element to type in a search something like this is
+needed:
+
+image::images/google-screenshot.png[Google Screenshot]
+
+*Python Sample*
+
+[source,python]
+-----------------------------------------------------------------------------
+wd.findElement(By.css(""))
+-----------------------------------------------------------------------------
+
+In order to find such elements, usually it's needed to inspect the internal
+structure of the page using the developer tools. It's the responsibility of the
+test creator to then determine the correct `CSS` or `XPath` selector that will
+be used, to uniquely identify that element.
+
+This is a tedious and error prone task, since even simple misspelling can cause
+a lot of wasted time in trying to figure out why the selector isn't matching
+the elements.
+
+That's why the Germanium Selector Builder (`GermaniumSB` from here) was
+written. In `GermaniumSB` you point your mouse to the element you want a
+selector for, and you click it.  The selector gets automatically written.
+
+image::images/germanium-very-basic-usage.png[Germanium Application Screenshot]
+
+Then the selector can be copied into the test.
+
+== Tutorial
+
+Text
+
+== Usage
+
+When opening `GermaniumSB` a window opens that allows code editing. In the code
+section is where the editing of the selectors, commenting them, or highlighting
+them for troubleshooting will take place.
+
+== Troubleshooting
+
+Text
