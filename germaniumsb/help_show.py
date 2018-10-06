@@ -17,10 +17,9 @@ def help_show() -> None:
         documentation_path = os.path.abspath(
             os.path.join(
                 base_dir("germaniumsb"), "doc", "index.chm"))
-        subprocess.check_call(['start', documentation_path])
+        subprocess.check_call(['hh.exe', documentation_path])
 
         return
-
 
     documentation_path = os.path.abspath(
         os.path.join(
@@ -33,7 +32,7 @@ def help_about_qt(parent: QWidget) -> None:
 
 
 def help_about(parent: QWidget) -> None:
-    QMessageBox.about(parent, 
+    QMessageBox.about(parent,
                       "Germanium Selector Builder v2.0.5",
                       "Made with passion in Austria.")
 
