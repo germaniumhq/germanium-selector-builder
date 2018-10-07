@@ -14,6 +14,8 @@ from germanium.static import \
 import traceback
 import os
 
+from germanium.static import *
+
 from germaniumsb.MainWindow import Ui_MainWindow
 from germaniumsb.BrowserStateMachine import BrowserStateMachine, BrowserState
 from germaniumsb.PythonHighlighter import PythonHighlighter
