@@ -1,6 +1,7 @@
 
 = Germanium Selector Builder 1.0.0
-:source-highlighter: highlight
+:source-highlighter: pygments
+:experimental:
 
 A simple yet powerful program to help you write Selenium selectors from
 GermaniumHQ. Also supports Germanium selectors.
@@ -18,7 +19,7 @@ needed:
 
 [source,python]
 -----------------------------------------------------------------------------
-wd.findElement(By.css("input[name='q']"))
+wd.find_element_by_css_selector("input[name='q']")
 -----------------------------------------------------------------------------
 
 *Java Sample*
@@ -47,9 +48,17 @@ image::images/germanium-very-basic-usage.png[Germanium Application Screenshot]
 
 Then the selector can be copied into the test.
 
-== Tutorial
+Multiple selectors can be edited at the same time in the editor, in the same
+way as in an SQL tool. The current selector can be evaluated using the menu
+entry `View` > `Highlight`, or its shortcut `Ctrl+H` when the cursor is on the
+line of the selector.
 
-Text
+Germanium selectors are also fully supported, and can also be edited and
+troubleshooted with syntax highlight.
+
+In the generation of the selectors, depending on which element is selected, an
+`XPath` or a `Css` selector will be generated. The type of the selector is
+reflected in the function name.
 
 == Usage
 
@@ -57,6 +66,70 @@ When opening `GermaniumSB` a window opens that allows code editing. In the code
 section is where the editing of the selectors, commenting them, or highlighting
 them for troubleshooting will take place.
 
-== Troubleshooting
+At the top there is a combo box that allows selecting the browser to be used,
+and that browser can be started using the `Start` button from the UI.
 
-Text
+=== UI Buttons
+
+1. `Start` / `Stop` - allows stopping and starting the browser. The browser can
+   be used as usual, only when picking elements the browsers clicks will be
+   consumed by `GermaniumSB` in order to find the elements. After that the
+   browser will resume its normal operation.
+2. `Live` - can be toggled up and down to stop or start the polling of the
+   browser;
+   +
+   `GermaniumSB` polls every 2 seconds the status of the browser, and ensures that
+   all the necessary scripts are injected correctly, and to retrieve the elements
+   that the user picked. Because of that it might be possible on some browsers
+   that the developer tools are unnaccessible, namely they will automatically
+   close when opened. This is a problem of the browsers, not `GermaniumSB`.
+   +
+   In order to allow the user to use the developer tools of the browser - it the
+   unfortunate case they close on polling, toggling the `Live` mode inactive will
+   pause the polling in the browser. Both the browser and the application can
+   still be used, but no selector picking, nor highlighting of elements is
+   possible.
+3. `Highlight` -when pressed will highlight the first element matching the selector
+   where the cursor is, and will update the number of _all the elements that
+   match the selector_. In case you have a flaky test it might happen because
+   the selector is not specific enough, matches multiple elements and will get
+   you in some runs the wrong element.
+4. `Pick` - that allows picking an element, for which the selector will be
+   generated, with up to 4 parent references.
+   +
+   Parent references are what allows diferentiating selectors that otherwise
+   would match too many elements. For example in a form that has many fields to
+   fill in, we will want to select an input that corresponds to a specific
+   label that's in front of that input.
+   +
+   For that in `GermaniumSB` we would pick `Pick` > `+1 reference`, select
+   first the input, then the parent reference we want this input to be related
+   to, namely the label.  The Elements section in the status bar will say how
+   many elements are still needed for selection in order to generate the
+   selector.
+
+=== UI Status Bar
+
+In the bottom left corner of the application, in the status bar there are three
+sections:
+
+1. `Status` - The status of the application. This shows 
+2. `Found` - How many elements were found on the last highlight operation.
+3. `Elements` - How many elements should still be picked before a selector
+   will be generated.
+
+
+== Germanium Selectors
+
+[source,python]
+-----------------------------------------------------------------------------
+Css("input[name='q']")                     # Selenium, using the pick
+InputText().above(Button("Google-Suche"))  # Germanium
+
+XPath("//div[string()='Google angeboten auf:  English  ']//a[string()='English']")
+Link().inside(Text("Google angeboten"))    # Germanium
+
+XPath("//a[string()='Unternehmen']")       # Selenium
+Link("Unternehmen")                        # Germanium
+-----------------------------------------------------------------------------
+
