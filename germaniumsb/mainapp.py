@@ -24,6 +24,7 @@ from germaniumsb.inject_code import \
     start_picking_into_current_document, \
     stop_picking_into_current_document, \
     run_in_all_iframes
+from germaniumsb.local_types import SelectorCallResult
 
 from germaniumsb.pick_element import get_picked_element
 import germaniumsb.help_show as help_show
@@ -374,12 +375,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 error_happened, \
                 error_messages = get_picked_element()
 
-            if not found_result:
-                return
-
             assert data
 
             self._update_elements_to_find_label(data.pickCount)
+
+            if not found_result:
+                return
 
             if not data:
                 raise Exception(f"Result was found, but the data is f{data}.")
@@ -415,12 +416,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         selector = eval(code)
 
-        def highlight_selector():
+        def highlight_selector() -> Optional[SelectorCallResult]:
             elements = selector.element_list()
 
             if elements:
                 highlight(selector)
-                return len(elements)
+                return SelectorCallResult(len(elements))
+
+            return None
 
         found_elements, _, error_happened, error_messages = \
             run_in_all_iframes(highlight_selector)

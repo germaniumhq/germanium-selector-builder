@@ -1,11 +1,15 @@
-from typing import Callable, Tuple, List
-from germaniumsb.local_types import ResultEvaluator, SelectorCallResult, ProcessingCall
+from typing import Callable, Tuple, List, Optional
+from germaniumsb.local_types import \
+    ResultEvaluator, \
+    SelectorCall, \
+    SelectorCallResult, \
+    ProcessingCall
 
 from germanium.static import Element, js, get_germanium
 import pkg_resources
 
 
-def inject_into_current_document():
+def inject_into_current_document() -> ProcessingCall:
     """
     Inject JS code into the document that allows picking
     the current element.
@@ -14,34 +18,41 @@ def inject_into_current_document():
     """
     script = pkg_resources.resource_string(__name__, "../js/main.js")
     if type(script) != 'str':  # it is bytes
-        script = script.decode('utf-8')
+        script = script.decode('utf-8')  # type: ignore
 
-    def inject_into_document():
+    def inject_into_document() -> Optional[SelectorCallResult]:
         if not is_germaniumsb_injected():
             js(script)
+        
+        return None
 
     return run_in_all_iframes(inject_into_document)
 
 
-def start_picking_into_current_document(count):
-    def start_picking_element():
+def start_picking_into_current_document(count) -> ProcessingCall:
+    def start_picking_element() -> Optional[SelectorCallResult]:
         js('germaniumPickElement(%s);' % count)
+
+        return None
 
     return run_in_all_iframes(start_picking_element)
 
 
-def stop_picking_into_current_document():
-    def stop_picking_element():
+def stop_picking_into_current_document() -> ProcessingCall:
+    def stop_picking_element() -> Optional[SelectorCallResult]:
         js('germaniumStopPickingElement();')
+
+        return None
 
     return run_in_all_iframes(stop_picking_element)
 
 
-def is_germaniumsb_injected():
+def is_germaniumsb_injected() -> bool:
     return js('return window["__germanium_loaded"];')
 
 
-def run_in_all_iframes(code, result_evaluator: ResultEvaluator=None) -> ProcessingCall:
+def run_in_all_iframes(code: SelectorCall, 
+                       result_evaluator: ResultEvaluator=None) -> ProcessingCall:
     get_germanium().switch_to.default_content()
 
     def default_result_evaluator(result):
@@ -54,7 +65,7 @@ def run_in_all_iframes(code, result_evaluator: ResultEvaluator=None) -> Processi
 
 
 def _run_in_all_iframes_internal(
-        code: Callable[[], SelectorCallResult],
+        code: SelectorCall,
         result_evaluator: ResultEvaluator,
         error_messages: List[str]=None,
         checked_frames=None) -> ProcessingCall:

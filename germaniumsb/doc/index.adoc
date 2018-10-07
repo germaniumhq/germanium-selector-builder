@@ -1,7 +1,11 @@
+
 = Germanium Selector Builder 1.0.0
+:source-highlighter: highlight
 
 A simple yet powerful program to help you write Selenium selectors from
-GermaniumHQ.
+GermaniumHQ. Also supports Germanium selectors.
+
+image::images/germanium-very-basic-usage.png[Germanium Application Screenshot]
 
 == Introduction
 
@@ -10,14 +14,21 @@ with. For example to interact with the google search, after opening the
 browser, to fetch the input element to type in a search something like this is
 needed:
 
-image::images/google-screenshot.png[Google Screenshot]
-
 *Python Sample*
 
 [source,python]
 -----------------------------------------------------------------------------
-wd.findElement(By.css(""))
+wd.findElement(By.css("input[name='q']"))
 -----------------------------------------------------------------------------
+
+*Java Sample*
+
+[source,python]
+-----------------------------------------------------------------------------
+wd.findElement(By.css("input[name='q']"))
+-----------------------------------------------------------------------------
+
+image::images/google-screenshot.png[Google Screenshot]
 
 In order to find such elements, usually it's needed to inspect the internal
 structure of the page using the developer tools. It's the responsibility of the
