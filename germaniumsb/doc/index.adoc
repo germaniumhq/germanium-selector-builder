@@ -3,6 +3,8 @@
 :source-highlighter: pygments
 :experimental:
 
+image:images/germanium-logo.png[logo]
+
 A simple yet powerful program to help you write Selenium selectors from
 GermaniumHQ. Also supports Germanium selectors.
 
@@ -71,6 +73,8 @@ and that browser can be started using the `Start` button from the UI.
 
 === UI Buttons
 
+image::images/germaniumsb-stopped.png[Germanium Selector Builder Started]
+
 1. `Start` / `Stop` - allows stopping and starting the browser. The browser can
    be used as usual, only when picking elements the browsers clicks will be
    consumed by `GermaniumSB` in order to find the elements. After that the
@@ -108,18 +112,50 @@ and that browser can be started using the `Start` button from the UI.
    many elements are still needed for selection in order to generate the
    selector.
 
+image::images/germaniumsb-ready.png[Germanium Selector Builder - Browser Ready]
+
 === UI Status Bar
 
 In the bottom left corner of the application, in the status bar there are three
 sections:
 
-1. `Status` - The status of the application. This shows 
+1. `Status` - The status of the application. This shows what's the current
+   state of the application. The available values are:
+    +
+    . Browser stopped - The browser needs to be started using the `Start`
+      button.
+    . Browser starting - The browser is starting up.
+    . Loading monitoring - GermaniumSB is loading its support scripts in the
+      browser.
+    . Ready - Browser is ready. You can use it normally, click around, type,
+      and from GermaniumSB highlight selectors.
+    . Picking element - After you click the `Pick` button, you can click in the
+      browser, to generate the selector for the clicked element.
+    . Paused - Script running in the browser is disabled, to allow the use of
+      the developer tools.
+    . Computing selector - Germanium Selector Builder is computing the selector
+      from the element.
+    . Error - Something bad happened.
 2. `Found` - How many elements were found on the last highlight operation.
-3. `Elements` - How many elements should still be picked before a selector
-   will be generated.
+    +
+    Whenever in Selenium you'll try to find an element, if there are multiple
+    elements matching that selector, there is a chance you'll get another
+    element when the test runs. To address this problem, Germanium Selector
+    Builder will show you how many other elements, including the one you see
+    being highlighted, matched the selector.
+3. `Elements` - How many elements should still be picked before a selector will
+be generated.
 
 
 == Germanium Selectors
+
+Beside generating Selenium selectors, Germanium Selector Builder allows
+debugging Germanium selectors. All germanium selectors defined by the Germanium
+API are available in the UI.
+
+image::images/germanium-selectors-highlight.png[Germanium Selectors]
+
+For example we could write the following selectors:
 
 [source,python]
 -----------------------------------------------------------------------------
@@ -132,4 +168,9 @@ Link().inside(Text("Google angeboten"))    # Germanium
 XPath("//a[string()='Unternehmen']")       # Selenium
 Link("Unternehmen")                        # Germanium
 -----------------------------------------------------------------------------
+
+The _highlight selector_ operation is available and works as expected. Also,
+selectors can be multiline, including the positional filtering, or DOM
+filtering like you can see in the 1st example in our list where we just define
+an `InputText().above(Button("Google-Suche"))`.
 
