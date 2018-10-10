@@ -5,6 +5,7 @@ germaniumPyExePipeline(
             gbs: "/_gbs/win32/",
             exe: "/src/dist/germaniumsb.exe",
             dockerTag: "germaniumhq/germanium-selector-builder:win32",
+            publishDownloads: "_gbs/win32/publish.yml",
             extraSteps: {
                 dockerRun image: 'bmst/chm-generator',
                     remove: true,
@@ -19,6 +20,7 @@ germaniumPyExePipeline(
             gbs: "/_gbs/lin64/",
             exe: "/src/dist/germaniumsb",
             dockerTag: "germaniumhq/germanium-selector-builder:lin64",
+            publishDownloads: "_gbs/lin64/publish.yml",
             extraSteps: {
                 dockerRun image: 'bmst/docker-asciidoctor',
                     remove: true,

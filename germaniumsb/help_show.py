@@ -1,6 +1,7 @@
 import subprocess
 import os
 import sys
+from textwrap import dedent
 from PySide2.QtWidgets import QWidget, QMessageBox
 
 
@@ -9,6 +10,7 @@ def base_dir(sub_path=""):
     # will be unpacked.
     if 'pth' in globals():
         return os.path.join(pth, sub_path)
+
     return os.path.abspath(os.path.dirname(__file__))
 
 
@@ -28,11 +30,17 @@ def help_show() -> None:
 
 
 def help_about_qt(parent: QWidget) -> None:
-    QMessageBox.aboutQt(parent, "GermaniumSB")
+    QMessageBox.aboutQt(parent, "Germanium Selector Builder v2.0.5")
 
 
 def help_about(parent: QWidget) -> None:
     QMessageBox.about(parent,
                       "Germanium Selector Builder v2.0.5",
-                      "Made with passion in Austria.")
+                      dedent("""\
+                          Released under license AGPL v3.
+
+                          (c) 2017-2108 Germanium HQ e.U. All rights reserved.
+
+                          Made with passion in Austria.
+                      """))
 
