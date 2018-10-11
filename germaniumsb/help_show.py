@@ -30,12 +30,12 @@ def help_show() -> None:
 
 
 def help_about_qt(parent: QWidget) -> None:
-    QMessageBox.aboutQt(parent, "Germanium Selector Builder v2.0.5")
+    QMessageBox.aboutQt(parent, "Germanium Selector Builder v1.0.0")
 
 
 def help_about(parent: QWidget) -> None:
     QMessageBox.about(parent,
-                      "Germanium Selector Builder v2.0.5",
+                      "Germanium Selector Builder v1.0.0",
                       dedent("""\
                           Released under license AGPL v3.
 

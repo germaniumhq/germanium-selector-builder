@@ -5,6 +5,9 @@ version:
     germaniumsb/MainWindow.py: '"Germanium Selector Builder **VERSION**"'
     germaniumsb/MainWindow.ui: '<string>Germanium Selector Builder **VERSION**</string>'
     germaniumsb/doc/index.adoc: = Germanium Selector Builder **VERSION$$
+    germaniumsb/help_show.py:
+      - 'QMessageBox.aboutQt(parent, "Germanium Selector Builder v**VERSION**")'
+      - '"Germanium Selector Builder v**VERSION**",'
 
 
 germanium:
