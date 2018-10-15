@@ -1,4 +1,5 @@
 - name: Publish the Lastest Germanium Selector Builder
+  gather_facts: False
   hosts: ciplogic
   tasks:
     - name: Create the germaniumsb release folder
@@ -11,13 +12,19 @@
       become: True
       synchronize:
         src: /src/_archive/germaniumsb
-        dest: /opt/www/germaniumhq_get/germaniumsb/germaniumsb
+        dest: /opt/www/germaniumhq_get/germaniumsb/germaniumsb_upload
 
     - name: Upload the windows binary file.
       become: True
       synchronize:
         src: /src/_archive/germaniumsb.exe
-        dest: /opt/www/germaniumhq_get/germaniumsb/germaniumsb.exe
+        dest: /opt/www/germaniumhq_get/germaniumsb/germaniumsb_upload.exe
+
+#    - name: Rename the binaries.
+#      become: True
+#      command: |
+#        mv /opt/www/germaniumhq_get/germaniumsb/germaniumsb_upload /opt/www/germaniumhq_get/germaniumsb/germaniumsb
+#        mv /opt/www/germaniumhq_get/germaniumsb/germaniumsb_upload.exe /opt/www/germaniumhq_get/germaniumsb/germaniumsb.exe
 
     - name: Change the owner to nginx
       become: True
