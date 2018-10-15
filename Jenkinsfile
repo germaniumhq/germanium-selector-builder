@@ -1,6 +1,6 @@
 germaniumPyExePipeline(
     runFlake8: false,
-    publishAnsiblePlay: "bin/publish.yml",
+
     binaries: [
         "Win 32": [
             gbs: "/_gbs/win32/",
@@ -29,5 +29,7 @@ germaniumPyExePipeline(
                     command: 'asciidoctor index.adoc'
             }
         ]
-    ]
+    ],
+
+    publishAnsiblePlay: "bin/publish.yml",
 )

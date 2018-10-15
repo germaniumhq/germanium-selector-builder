@@ -10,13 +10,13 @@
     - name: Upload the linux binary file.
       become: True
       synchronize:
-        src: /src/germaniumsb
+        src: /src/_archive/germaniumsb
         dest: /opt/www/germaniumhq_get/germaniumsb/germaniumsb
 
     - name: Upload the windows binary file.
       become: True
       synchronize:
-        src: /src/germaniumsb.exe
+        src: /src/_archive/germaniumsb.exe
         dest: /opt/www/germaniumhq_get/germaniumsb/germaniumsb.exe
 
     - name: Change the owner to nginx
