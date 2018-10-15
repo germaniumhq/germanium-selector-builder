@@ -1,6 +1,5 @@
 - name: Publish the Lastest Germanium Selector Builder
   hosts: ciplogic
-  become: true
   tasks:
     - name: Download the linux binary from nexus.
       delegate_to: localhost
@@ -17,21 +16,25 @@
         force: yes
 
     - name: Create the germaniumsb release folder
+      become: True
       file:
         state: directory
         path: /opt/www/germaniumhq_get/germaniumsb
 
     - name: Upload the linux binary file.
+      become: True
       synchronize:
         src: /tmp/germaniumsb
         dest: /opt/www/germaniumhq_get/germaniumsb/germaniumsb
 
     - name: Upload the windows binary file.
+      become: True
       synchronize:
         src: /tmp/germaniumsb.exe
         dest: /opt/www/germaniumhq_get/germaniumsb/germaniumsb.exe
 
     - name: Change the owner to nginx
+      become: True
       file:
         path: /opt/www/germaniumhq_get/germaniumsb
         owner: 100
