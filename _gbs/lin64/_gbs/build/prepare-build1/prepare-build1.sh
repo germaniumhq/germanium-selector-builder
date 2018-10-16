@@ -1,4 +1,3 @@
 pip install pyinstaller
-
-# FIXME: test if it actually works
+pip install behave
 pip install pyside2
