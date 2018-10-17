@@ -20,11 +20,11 @@
         src: /src/_archive/germaniumsb.exe
         dest: /opt/www/germaniumhq_get/germaniumsb/germaniumsb_upload.exe
 
-#    - name: Rename the binaries.
-#      become: True
-#      command: |
-#        mv /opt/www/germaniumhq_get/germaniumsb/germaniumsb_upload /opt/www/germaniumhq_get/germaniumsb/germaniumsb
-#        mv /opt/www/germaniumhq_get/germaniumsb/germaniumsb_upload.exe /opt/www/germaniumhq_get/germaniumsb/germaniumsb.exe
+    - name: Rename the binaries.
+      become: True
+      command: |
+        mv /opt/www/germaniumhq_get/germaniumsb/germaniumsb_upload /opt/www/germaniumhq_get/germaniumsb/germaniumsb
+        mv /opt/www/germaniumhq_get/germaniumsb/germaniumsb_upload.exe /opt/www/germaniumhq_get/germaniumsb/germaniumsb.exe
 
     - name: Change the owner to nginx
       become: True
