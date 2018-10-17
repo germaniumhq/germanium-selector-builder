@@ -35,7 +35,7 @@ germaniumPyExePipeline(
     postBuild: {
         stage('Integration') {
             docker.image('germaniumhq/germanium-selector-builder:lin64')
-                .inside('--link vnc-server:vnc-server --privileged -v /dev/shm:/dev/shm') {
+                .inside('--link vnc-server:vnc-server --privileged --shm-size 2G') {
                     junitReports("/src/reports") {
                         sh """
                             cd /src
