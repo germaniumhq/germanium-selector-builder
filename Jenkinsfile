@@ -39,7 +39,7 @@ germaniumPyExePipeline(
                     junitReports("/src/reports") {
                         sh """
                             cd /src
-                            export DISPLAY=vnc-server:0
+                            export DISPLAY="\$VNC_SERVER_PORT_6000_TCP_ADDR:0"
                             behave --junit
                         """
                     }
