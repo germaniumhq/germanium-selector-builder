@@ -6,7 +6,7 @@ export interface IGermaniumSelectorConfig {
 }
 
 /**
- * Consturct a Germanium selector for the given element.
+ * Construct a Germanium selector for the given element.
  * @param element The HTML Element to build the selector for
  */
 export function constructGermaniumSelector(element: Element, config?: IGermaniumSelectorConfig) : GeElement {
@@ -87,7 +87,10 @@ export function constructGermaniumSelector(element: Element, config?: IGermanium
     if (attributes['class']) {
         // we try each class in turn, then if not matching we try
         // using all the classes
-        const cssClasses =  attributes['class'].split(/\s+/)
+        const cssClasses: Array<string> =  attributes['class'].split(/\s+/)
+        
+        removeClassesThatAreProbablyBogus(cssClasses)
+        cssClasses.sort(sortClassesByMostLikelyMeaning)
 
         for (let i = 0; i < cssClasses.length; i++) {
             selector.cssClasses = [ cssClasses[i] ]
@@ -114,6 +117,36 @@ export function constructGermaniumSelector(element: Element, config?: IGermanium
 
     return selector;
 }
+
+function removeClassesThatAreProbablyBogus(
+    cssClassesArray: Array<string>): void {
+    
+    for (var i = cssClassesArray.length - 1; i >= 0; i--) {
+        if (isBogusCssClass(cssClassesArray[i])) {
+            cssClassesArray.splice(i, 1)
+        }
+    }
+}
+
+function isBogusCssClass(name: string): boolean {
+    if (!name) {
+        return true
+    }
+
+    if (/focus/.test(name)) {
+        return true
+    }
+
+    return false
+}
+
+function sortClassesByMostLikelyMeaning(
+        firstCssClass: string,
+        secondCssClass: string): number {
+    // longer lenght go first
+    return secondCssClass.length - firstCssClass.length
+}
+
 
 function parseUrl(url: string) {
     var pattern = RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");

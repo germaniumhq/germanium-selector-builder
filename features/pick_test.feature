@@ -69,3 +69,10 @@ Scenario: Picking an image that matches shuld get the real reference
   Given I open the browser on the static test page
   When I try to pick the element `Css("#double-matching1")`
   Then I get the css selector: "img[src='/some/image/image.png']"
+
+@10
+Scenario: Picking an input where a focus class gets assigned,
+    should not return the focus class in the returned selector.
+  Given I open the browser on the static test page
+  When I try to pick the element `Css("#first-input")`
+  Then I get the css selector: "input[name='address'].short-identifier"
