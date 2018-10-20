@@ -22,7 +22,7 @@ Scenario: Picking two elements that are far to each other
   Given I open the browser on the saved google page
   When I try to pick 2 elements: `InputText()`
   And using a reference of: `Text("Österreich")`
-  Then I get the xpath selector: u"//div[string()='Österreich'][contains(concat(' ', @class, ' '), ' logo-subtext ')]/ancestor::div[contains(concat(' ', @class, ' '), ' ctr-p ')]//input[@name='q']"
+  Then I get the xpath selector: u"//div[string()='Österreich'][contains(concat(' ', @class, ' '), ' logo-subtext ')]/../../../../../../..//input[@name='q']"
   When I try to find the returned xpath selector
   Then I get the element: `InputText()`
 
@@ -33,7 +33,7 @@ Scenario: Picking three elements with the mouse should
   When I try to pick 3 elements: `InputText()`
   And using a first reference of: `Element('span').right_of(InputText())`
   And using a second reference of: `Text("Österreich")`
-  Then I get the xpath selector: u"//div[string()='Österreich'][contains(concat(' ', @class, ' '), ' logo-subtext ')]/ancestor::div[contains(concat(' ', @class, ' '), ' ctr-p ')]//span[contains(concat(' ', @class, ' '), ' gsri_a ')]/../../..//input[@name='q']"
+  Then I get the xpath selector: u"//div[string()='Österreich'][contains(concat(' ', @class, ' '), ' logo-subtext ')]/../../../../../../..//span[contains(concat(' ', @class, ' '), ' gsri_a ')]/../../..//input[@name='q']"
   When I try to find the returned xpath selector
   Then I get the element: `InputText()`
 

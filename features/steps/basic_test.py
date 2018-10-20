@@ -7,9 +7,10 @@ from germanium.static import *
 
 use_step_matcher("re")
 
-
-assertEqual = unittest.TestCase().assertEqual
-assertIsNotNone = unittest.TestCase().assertIsNotNone
+testcase = unittest.TestCase()
+testcase.maxDiff = None
+assertEqual = testcase.assertEqual
+assertIsNotNone = testcase.assertIsNotNone
 
 
 @step("I open the browser on the saved google page")

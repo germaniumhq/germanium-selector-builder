@@ -33,16 +33,6 @@ export function xpathRelativize(parentReferenceXPath: string,
         return parentReferenceXPath;
     }
 
-    // we exit from the reference node until the common parent.
-    // if we have more than 3 levels of exiting, we build a selector for the
-    // common parent.
-    if (parentAbsoluteXPath.length - index > 3) {
-        return removeXPathPrefix(parentReferenceXPath) + 
-                 "/ancestor::" + 
-                 removeXPathSearchPrefix(constructGermaniumSelector(commonParent, { excludeTextSearch: true }).asXPath()) + 
-                 removeXPathPrefix(targetNodeXPath)
-    }
-
     let prefix = ""
     for (let i = 0; i < parentAbsoluteXPath.length - index; i++) {
         prefix += '/..'
