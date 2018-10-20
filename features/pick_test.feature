@@ -57,3 +57,15 @@ Scenario: Picking an element that is nested in another element, with the parent 
   When I try to pick 2 elements: `Element('a', exact_text='Deutsch')`
   And using a reference of: `XPath("//div[string()='Google.at offered in: Deutsch ']")`
   Then I get the xpath selector: "//div[string()='Google.at offered in: Deutsch ']//a[string()='Deutsch']"
+
+@8
+Scenario: Picking an image should get only the image reference.
+  Given I open the browser on the static test page
+  When I try to pick the element `Css("#single-matching")`
+  Then I get the xpath selector: "//img[contains(normalize-space(@src), '/cool.png')]"
+
+@9
+Scenario: Picking an image that matches shuld get the real reference
+  Given I open the browser on the static test page
+  When I try to pick the element `Css("#double-matching1")`
+  Then I get the css selector: "img[src='/some/image/image.png']"

@@ -50,6 +50,28 @@ export function constructGermaniumSelector(element: Element, config?: IGermanium
         }
     }
 
+    if (selector.tagName == 'img') {
+        const imagePath = attributes["src"] && parseUrl(attributes["src"]).path
+    
+        // try first /^...(/foo.gif)?...$/ and generate a contains if possible
+        if (imagePath) {
+            const imageFileName = /^.*?(\/?([^\/]+))$/.exec(imagePath)[1]
+
+            if (imageFileName) {
+                const imageContainsSelector = selector.clone()
+                imageContainsSelector.containsAttributes["src"] = imageFileName
+
+                if (isUnique(imageContainsSelector)) {
+                    return imageContainsSelector;
+                }
+            }
+        }
+
+        if (singleAttributeExactMatch(selector, attributes, 'src')) {
+            return selector
+        }
+    }
+
     if (singleAttributeExactMatch(selector, attributes, 'title')) {
         return selector;
     }
@@ -60,13 +82,6 @@ export function constructGermaniumSelector(element: Element, config?: IGermanium
 
     if (singleAttributeExactMatch(selector, attributes, 'aria-label')) {
         return selector;
-    }
-
-    if (selector.tagName == 'img') {
-        // FIXME: try first /^...(/foo.gif)?...$/ and generate a contains if possible
-        if (singleAttributeExactMatch(selector, attributes, 'src')) {
-            return selector
-        }
     }
 
     if (attributes['class']) {
@@ -98,6 +113,18 @@ export function constructGermaniumSelector(element: Element, config?: IGermanium
     }
 
     return selector;
+}
+
+function parseUrl(url: string) {
+    var pattern = RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
+    var matches =  url.match(pattern);
+    return {
+        scheme: matches[2],
+        authority: matches[4],
+        path: matches[5],
+        query: matches[7],
+        fragment: matches[9]
+    };
 }
 
 export function removeXPathPrefix(onlySelector: string) : string {
@@ -132,19 +159,21 @@ export function removeXPathSearchPrefix(onlySelector: string) : string {
     return onlySelector
 }
 
-function singleAttributeExactMatch(selector: GeElement,
-    attributes: { [name: string] : string },
-    attributeName: string) : boolean {
+function singleAttributeExactMatch(
+        selector: GeElement,
+        attributes: { [name: string] : string },
+        attributeName: string) : GeElement {
+
 
     if (typeof attributes[attributeName] != "undefined") {
         selector.exactAttributes[attributeName] = attributes[attributeName]
 
         if (isUnique(selector)) {
-            return true;
+            return selector;
         }
     }
 
-    return false;
+    return null;
 }
 
 function isUnique(selector: GeElement) : boolean {

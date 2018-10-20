@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "test.",
   "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "watch": "webpack --config webpack.config.js -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "main": "out/main.js",

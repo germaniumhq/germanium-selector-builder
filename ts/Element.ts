@@ -21,6 +21,15 @@ function cloneAttributes(attrs: IExactAttributes) : IExactAttributes {
     return result
 }
 
+function isEmpty(obj) {
+    for(var prop in obj) {
+        if(obj.hasOwnProperty(prop))
+            return false;
+    }
+
+    return JSON.stringify(obj) === JSON.stringify({});
+}
+
 /**
  * An element equivalent from Germanium.
  */
@@ -65,7 +74,12 @@ export class GeElement implements IElementConfig {
     }
 
     private isXPathSelector() : boolean {
-        return (this.index || this.containsText || this.exactText || this.extraXPath) && true;
+        return (this.index || 
+            this.containsText || 
+            this.exactText || 
+            this.extraXPath ||
+            !isEmpty(this.containsAttributes)
+        ) && true;
     }
 
     asCss() : string {

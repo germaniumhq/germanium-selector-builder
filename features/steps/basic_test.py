@@ -17,6 +17,11 @@ def open_browser_on_saved_google_page(context):
     go_to("http://localhost:8000/features/sites/saved_google")
 
 
+@step("I open the browser on the static test page")
+def open_browser_on_static_test_page(context):
+    go_to("http://localhost:8000/features/sites/static_test_site")
+
+
 @step("I try to resolve the element `(.*?)`")
 def resolve_germanium_selector_in_js(context, source):
     element = eval(source + '.element()', globals(), dict())

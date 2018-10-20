@@ -26,6 +26,8 @@ export function convertToSelector(elements: Array<Element>) : string {
 function constructXPathSelector(elements: Array<Element>) : string {
     let result = constructGermaniumSelector(elements[0])
     
+    console.log(result)
+
     if (elements.length == 1) {
         return result && result.asXPath();
     }
