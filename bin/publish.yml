@@ -22,16 +22,9 @@
 
     - name: Rename the binaries.
       become: True
-      command: |
-        mv /opt/www/germaniumhq_get/germaniumsb/germaniumsb_upload /opt/www/germaniumhq_get/germaniumsb/germaniumsb
-        mv /opt/www/germaniumhq_get/germaniumsb/germaniumsb_upload.exe /opt/www/germaniumhq_get/germaniumsb/germaniumsb.exe
-
-    - name: Change the owner to nginx
-      become: True
-      file:
-        path: /opt/www/germaniumhq_get/germaniumsb
-        owner: 100
-        group: 101
-        recurse: true
-
+      shell: |
+        mv -f /opt/www/germaniumhq_get/germaniumsb/germaniumsb_upload /opt/www/germaniumhq_get/germaniumsb/germaniumsb
+        mv -f /opt/www/germaniumhq_get/germaniumsb/germaniumsb_upload.exe /opt/www/germaniumhq_get/germaniumsb/germaniumsb.exe
+        chmod 660 /opt/www/germaniumhq_get/germaniumsb/germaniumsb
+        chown -R 100:101 /opt/www/germaniumhq_get/germaniumsb/
 
