@@ -15,13 +15,16 @@ germaniumPyExePipeline(
 
                 docker.image('germaniumhq/germanium-selector-builder:lin64-test')
                     .inside('--link vnc-server:vnc-server --privileged --shm-size 2G') {
-                        junitReports("/src/reports") {
-                            sh """
-                                cd /src
-                                export DISPLAY="\$VNC_SERVER_PORT_6000_TCP_ADDR:0"
-                                behave --junit
-                            """
-                        }
+                        sh """
+                            cd /src
+                            export DISPLAY="\$VNC_SERVER_PORT_6000_TCP_ADDR:0"
+                            ls -la
+                            pwd
+                            behave --junit
+                            cp -R reports ${pwd()}/reports
+                        """
+
+                        junit 'reports/*.xml'
                     }
             }
         }
