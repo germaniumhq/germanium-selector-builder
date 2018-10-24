@@ -2,6 +2,31 @@ germaniumPyExePipeline(
     name: "germanium-selector-builder",
     runFlake8: false,
 
+    preBuild: {
+        stage('Container Tests') {
+            node {
+                deleteDir()
+                checkout scm
+
+                gbsBuild([
+                    gbs: '/_gbs/lin64/Dockerfile.gbs.test',
+                    dockerTag: 'germaniumhq/germanium-selector-builder:lin64-test'
+                ])
+
+                docker.image('germaniumhq/germanium-selector-builder:lin64-test')
+                    .inside('--link vnc-server:vnc-server --privileged --shm-size 2G') {
+                        junitReports("/src/reports") {
+                            sh """
+                                cd /src
+                                export DISPLAY="\$VNC_SERVER_PORT_6000_TCP_ADDR:0"
+                                behave --junit
+                            """
+                        }
+                    }
+            }
+        }
+    },
+
     binaries: [
         "Win 32": [
             gbs: "/_gbs/win32/",
@@ -31,21 +56,6 @@ germaniumPyExePipeline(
             }
         ]
     ],
-
-    postBuild: {
-        stage('Integration') {
-            docker.image('germaniumhq/germanium-selector-builder:lin64')
-                .inside('--link vnc-server:vnc-server --privileged --shm-size 2G') {
-                    junitReports("/src/reports") {
-                        sh """
-                            cd /src
-                            export DISPLAY="\$VNC_SERVER_PORT_6000_TCP_ADDR:0"
-                            behave --junit
-                        """
-                    }
-                }
-        }
-    },
 
     publishAnsiblePlay: "bin/publish.yml",
 )

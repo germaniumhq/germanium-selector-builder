@@ -1,0 +1,1 @@
+FROM germaniumhq/python-test:3.6
