@@ -8,31 +8,28 @@ germaniumPyExePipeline(
                 deleteDir()
                 checkout scm
 
-                gbsBuild([
-                    gbs: '/_gbs/lin64/Dockerfile.gbs.test',
+                gbs().test([
+                    platform: 'python:3.6',
+                    prefix: '/_gbs/lin64/',
                     dockerTag: 'germaniumhq/germanium-selector-builder:lin64-test'
-                ])
+                ]).inside('--link vnc-server:vnc-server --privileged --shm-size 2G') {
+                    sh """
+                        cd /src
+                        export DISPLAY="\$VNC_SERVER_PORT_6000_TCP_ADDR:0"
+                        behave --junit
+                        cp -R reports ${pwd()}/reports
+                    """
 
-                docker.image('germaniumhq/germanium-selector-builder:lin64-test')
-                    .inside('--link vnc-server:vnc-server --privileged --shm-size 2G') {
-                        sh """
-                            cd /src
-                            export DISPLAY="\$VNC_SERVER_PORT_6000_TCP_ADDR:0"
-                            ls -la
-                            pwd
-                            behave --junit
-                            cp -R reports ${pwd()}/reports
-                        """
-
-                        junit 'reports/*.xml'
-                    }
+                    junit 'reports/*.xml'
+                }
             }
         }
     },
 
     binaries: [
         "Win 32": [
-            gbs: "/_gbs/win32/",
+            platform: "python:3.6-win32",
+            prefix: "/_gbs/win32/",
             exe: "/src/dist/germaniumsb.exe",
             dockerTag: "germaniumhq/germanium-selector-builder:win32",
             extraSteps: {
@@ -46,7 +43,8 @@ germaniumPyExePipeline(
         ],
 
         "Lin 64": [
-            gbs: "/_gbs/lin64/",
+            platform: "python:3.6",
+            prefix: "/_gbs/lin64/",
             exe: "/src/dist/germaniumsb",
             dockerTag: "germaniumhq/germanium-selector-builder:lin64",
             extraSteps: {

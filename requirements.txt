@@ -1,1 +1,1 @@
-_gbs/win32/_gbs/build/prepare-build2/requirements.txt
+_gbs/lin64/_gbs/prepare-build2/requirements.txt
