@@ -5,8 +5,7 @@ germaniumPyExePipeline(
     preBuild: {
         stage('Container Tests') {
             node {
-                deleteDir()
-                checkout scm
+                checkoutWithVersionManager()
 
                 gbs().test([
                     platform: 'python:3.6',
