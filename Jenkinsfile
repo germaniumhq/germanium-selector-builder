@@ -1,6 +1,7 @@
 germaniumPyExePipeline(
     name: "germanium-selector-builder",
     runFlake8: false,
+    github: "git@github.com:germaniumhq/germanium-selector-builder.git",
 
     preBuild: {
         stage('Container Tests') {
