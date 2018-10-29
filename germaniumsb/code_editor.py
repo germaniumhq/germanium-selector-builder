@@ -28,6 +28,9 @@ def extract_code(full_text: str, cursor_position: Dict[str, int]) -> str:
 
 
 def insert_code_into_editor(cursor, text: str) -> None:
+    if not text.endswith("\n"):
+        text = text + "\n"
+
     cursor.beginEditBlock()
     cursor.insertText(text)
     cursor.endEditBlock()
