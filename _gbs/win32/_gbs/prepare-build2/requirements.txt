@@ -1,2 +1,1 @@
 germanium==2.0.11
-pyside2
