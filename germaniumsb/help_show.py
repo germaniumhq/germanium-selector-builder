@@ -39,7 +39,7 @@ def help_about(parent: QWidget) -> None:
                       dedent("""\
                           Released under license AGPL v3.
 
-                          (c) 2017-2108 Germanium HQ e.U. All rights reserved.
+                          (c) 2017-2018 Germanium HQ e.U. All rights reserved.
 
                           Made with passion in Austria.
                       """))
