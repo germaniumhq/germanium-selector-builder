@@ -7,7 +7,7 @@ class QObject:
     pass
 
 
-class QWidget:
+class QWidget(QObject):
     def deleteLater(self):
         pass
 
@@ -143,7 +143,7 @@ class QAction:
         self.triggered: QEvent
 
 
-class QMenu:
+class QMenu(QWidget):
     def __init__(self,
                  title_or_parent: Union[Optional[QWidget], str] = None,
                  parent: Optional[QWidget] = None) -> None:
